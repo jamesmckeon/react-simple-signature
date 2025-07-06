@@ -1,4 +1,4 @@
 # react-simple-signature
  a react component that allows for capturing lines drawn via touch or mouse
 
-Handle high-DPI screens by scaling the canvas using window.devicePixelRatio.
+High-DPI (Retina) screen support has been added. The canvas now uses devicePixelRatio to scale the drawing surface appropriately while preserving the intended display size.

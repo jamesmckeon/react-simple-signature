@@ -2,28 +2,31 @@
 import React, {
   useRef, useEffect, useState
 } from "react";
-  
-// generated via CoPilot
-// originally tried using react-signature-canvas package but
-// current alpha version (works with React v19) has bugs
-export default function SignaturePad ({
-  onSignatureChange, height 
-}:{ onSignatureChange: (blob: Blob) => void,
-  height: number|null }) {
+
+
+export interface SignaturePadProps {
+  onSignatureChange: (blob: Blob) => void;
+  height: number | null;
+  width: number | null;
+}
+
+export default function SignaturePad({
+  onSignatureChange, height, width
+}: SignaturePadProps) {
   // Reference to the canvas element
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   // Tracks if drawing is in progress
   const [drawing, setDrawing] = useState(false);
-  
+
   // Tracks if any drawing has occurred
   const [hasDrawn, setHasDrawn] = useState(false);
-  
+
   // Set up the canvas context properties when the component mounts
   useEffect(() => {
 
     const ctx = canvasRef.current?.getContext("2d");
-    
+
     if (!ctx)
       return;
 
@@ -31,19 +34,19 @@ export default function SignaturePad ({
     ctx.lineCap = "round";
     ctx.strokeStyle = "#000";
   }, []);
-  
+
   // Starts drawing on the canvas
   const startDrawing = (e:
-  React.MouseEvent<HTMLCanvasElement> | 
-  React.TouchEvent<HTMLCanvasElement>) => {
+    React.MouseEvent<HTMLCanvasElement> |
+    React.TouchEvent<HTMLCanvasElement>) => {
     // Get the position of the event relative to the canvas
     const {
-      offsetX, offsetY 
+      offsetX, offsetY
     } = getEventPosition(e);
-   
+
     const ctx = canvasRef.current?.getContext("2d");
 
-    if(!ctx)
+    if (!ctx)
       return;
 
     ctx.beginPath();
@@ -57,27 +60,27 @@ export default function SignaturePad ({
     // when drawing has completed
     setHasDrawn(false);
   };
-  
+
   // Draws on the canvas
-  const draw = (e: React.MouseEvent<HTMLCanvasElement> | 
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> |
     React.TouchEvent<HTMLCanvasElement>) => {
     // If drawing is not in progress, exit the function
     if (!drawing) return;
 
     const position = getEventPosition(e);
 
-    if (!position) 
+    if (!position)
       return;
 
     // Get the position of the event relative to the canvas
     const {
-      offsetX, offsetY 
+      offsetX, offsetY
     } = position;
 
     const ctx = canvasRef.current?.getContext("2d");
 
-    if(!ctx)
-      return; 
+    if (!ctx)
+      return;
 
     // Draw a line to the event position
     ctx.lineTo(offsetX, offsetY);
@@ -86,7 +89,7 @@ export default function SignaturePad ({
     // Mark that drawing occurred
     setHasDrawn(true);
   };
-  
+
   // Ends drawing on the canvas
   const endDrawing = () => {
     // Drawing is complete, so update state
@@ -95,8 +98,8 @@ export default function SignaturePad ({
 
     const ctx = canvasRef.current?.getContext("2d");
 
-    if(!ctx)
-      return; 
+    if (!ctx)
+      return;
 
     ctx.closePath();
 
@@ -105,23 +108,23 @@ export default function SignaturePad ({
       emitBlob();
     }
   };
-  
+
   // Returns the position of the event relative to the canvas
-  const getEventPosition = (e: React.TouchEvent<HTMLCanvasElement> | 
+  const getEventPosition = (e: React.TouchEvent<HTMLCanvasElement> |
     React.MouseEvent<HTMLCanvasElement>) => {
 
     const canvas = canvasRef.current;
 
-    if (!canvas) 
+    if (!canvas)
       return null;
 
-    let clientX,clientY;
+    let clientX, clientY;
 
     if ("touches" in e) {
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
     }
-    else{
+    else {
       clientX = e.clientX;
       clientY = e.clientY;
     }
@@ -137,7 +140,7 @@ export default function SignaturePad ({
   // Returns the canvas contents as a png blob
   const emitBlob = () => {
 
-    if (!canvasRef.current) 
+    if (!canvasRef.current)
       return;
 
     canvasRef.current.toBlob((blob) => {
@@ -148,28 +151,29 @@ export default function SignaturePad ({
       }
     }, "image/png");
   };
-  
+
 
   return (
-    <div>
-      <canvas
-        height={ height ?? 200 }
-        onMouseDown={ startDrawing }
-        onMouseLeave={ endDrawing }
-        onMouseMove={ draw }
-        onMouseUp={ endDrawing }
-        onTouchEnd={ endDrawing }
-        onTouchMove={ draw }
-        onTouchStart={ startDrawing }
-        ref={ canvasRef }
-        style={ {
-          touchAction: "none" 
-        } }
-        width={ 500 }
-      />
-    </div>
+    //<div className="component">
+    <canvas
+
+      onMouseDown={startDrawing}
+      onMouseLeave={endDrawing}
+      onMouseMove={draw}
+      onMouseUp={endDrawing}
+      onTouchEnd={endDrawing}
+      onTouchMove={draw}
+      onTouchStart={startDrawing}
+      ref={canvasRef}
+      height={height ?? 400}
+      width={width ?? 400}
+      style={{
+        touchAction: "none"
+      }}
+    />
+    // </div>
   );
 
-  
+
 };
-  
+

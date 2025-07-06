@@ -2,6 +2,8 @@ import React, {
   useRef, useEffect, useState
 } from "react";
 
+import "./component.css";
+
 export interface SignaturePadProps {
   onSignatureChange: (blob: Blob) => void;
   height: number | null;
@@ -122,19 +124,29 @@ export default function SignaturePad({
     }, "image/png");
   };
 
+  const clearClicked = () => {
+
+    if (!canvasRef.current) return;
+    const ctx = canvasRef.current?.getContext("2d");
+    ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+  }
+
   return (
-    <canvas
-      onMouseDown={startDrawing}
-      onMouseLeave={endDrawing}
-      onMouseMove={draw}
-      onMouseUp={endDrawing}
-      onTouchEnd={endDrawing}
-      onTouchMove={draw}
-      onTouchStart={startDrawing}
-      ref={canvasRef}
-      style={{
-        touchAction: "none"
-      }}
-    />
+    <div className="component">
+      <canvas
+        onMouseDown={startDrawing}
+        onMouseLeave={endDrawing}
+        onMouseMove={draw}
+        onMouseUp={endDrawing}
+        onTouchEnd={endDrawing}
+        onTouchMove={draw}
+        onTouchStart={startDrawing}
+        ref={canvasRef}
+        style={{
+          touchAction: "none"
+        }}
+      />
+      <button type="button" onClick={clearClicked}>&#x2715;</button>
+    </div>
   );
 } 

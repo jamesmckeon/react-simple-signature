@@ -1,8 +1,6 @@
-
 import React, {
   useRef, useEffect, useState
 } from "react";
-
 
 export interface SignaturePadProps {
   onSignatureChange: (blob: Blob) => void;
@@ -13,118 +11,95 @@ export interface SignaturePadProps {
 export default function SignaturePad({
   onSignatureChange, height, width
 }: SignaturePadProps) {
-  // Reference to the canvas element
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Tracks if drawing is in progress
   const [drawing, setDrawing] = useState(false);
-
-  // Tracks if any drawing has occurred
   const [hasDrawn, setHasDrawn] = useState(false);
+  const [lastPoint, setLastPoint] = useState<{ x: number; y: number } | null>(null);
 
-  // Set up the canvas context properties when the component mounts
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const ctx = canvasRef.current?.getContext("2d");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    if (!ctx)
-      return;
+    const dpr = window.devicePixelRatio || 1;
+    const canvasWidth = (width ?? 400);
+    const canvasHeight = (height ?? 400);
+
+    canvas.width = canvasWidth * dpr;
+    canvas.height = canvasHeight * dpr;
+    canvas.style.width = `${canvasWidth}px`;
+    canvas.style.height = `${canvasHeight}px`;
+    ctx.scale(dpr, dpr);
 
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
     ctx.strokeStyle = "#000";
-  }, []);
+  }, [width, height]);
 
-  // Starts drawing on the canvas
-  const startDrawing = (e:
-    React.MouseEvent<HTMLCanvasElement> |
-    React.TouchEvent<HTMLCanvasElement>) => {
-    // Get the position of the event relative to the canvas
-    const {
-      offsetX, offsetY
-    } = getEventPosition(e);
-
+  const startDrawing = (
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) => {
+    const { offsetX, offsetY } = getEventPosition(e);
     const ctx = canvasRef.current?.getContext("2d");
-
-    if (!ctx)
-      return;
+    if (!ctx) return;
 
     ctx.beginPath();
-    // Move the drawing cursor to the event position
     ctx.moveTo(offsetX, offsetY);
-
-    // update setDrawing so dependent methods 
-    // know a drawing is in progress
     setDrawing(true);
-    // Reset the drawing flag, should be set to true
-    // when drawing has completed
     setHasDrawn(false);
+    setLastPoint({ x: offsetX, y: offsetY });
   };
 
-  // Draws on the canvas
-  const draw = (e: React.MouseEvent<HTMLCanvasElement> |
-    React.TouchEvent<HTMLCanvasElement>) => {
-    // If drawing is not in progress, exit the function
+  const draw = (
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) => {
     if (!drawing) return;
 
     const position = getEventPosition(e);
+    if (!position || !lastPoint) return;
 
-    if (!position)
-      return;
-
-    // Get the position of the event relative to the canvas
-    const {
-      offsetX, offsetY
-    } = position;
-
+    const { offsetX, offsetY } = position;
     const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
 
-    if (!ctx)
-      return;
+    const midX = (lastPoint.x + offsetX) / 2;
+    const midY = (lastPoint.y + offsetY) / 2;
 
-    // Draw a line to the event position
-    ctx.lineTo(offsetX, offsetY);
-    // Render the drawing on the canvas
+    ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midX, midY);
     ctx.stroke();
-    // Mark that drawing occurred
+
+    setLastPoint({ x: offsetX, y: offsetY });
     setHasDrawn(true);
   };
 
-  // Ends drawing on the canvas
   const endDrawing = () => {
-    // Drawing is complete, so update state
-    // accordingly
     setDrawing(false);
+    setLastPoint(null);
 
     const ctx = canvasRef.current?.getContext("2d");
-
-    if (!ctx)
-      return;
+    if (!ctx) return;
 
     ctx.closePath();
 
-    // If something was drawn, emit the blob
     if (hasDrawn) {
       emitBlob();
     }
   };
 
-  // Returns the position of the event relative to the canvas
-  const getEventPosition = (e: React.TouchEvent<HTMLCanvasElement> |
-    React.MouseEvent<HTMLCanvasElement>) => {
-
+  const getEventPosition = (
+    e: React.TouchEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>
+  ) => {
     const canvas = canvasRef.current;
-
-    if (!canvas)
-      return null;
+    if (!canvas) return null;
 
     let clientX, clientY;
 
     if ("touches" in e) {
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
-    }
-    else {
+    } else {
       clientX = e.clientX;
       clientY = e.clientY;
     }
@@ -137,26 +112,18 @@ export default function SignaturePad({
     };
   };
 
-  // Returns the canvas contents as a png blob
   const emitBlob = () => {
-
-    if (!canvasRef.current)
-      return;
+    if (!canvasRef.current) return;
 
     canvasRef.current.toBlob((blob) => {
-      // If the onSignatureChange callback is provided,
-      // pass the blob to it
       if (onSignatureChange && blob) {
         onSignatureChange(blob);
       }
     }, "image/png");
   };
 
-
   return (
-    //<div className="component">
     <canvas
-
       onMouseDown={startDrawing}
       onMouseLeave={endDrawing}
       onMouseMove={draw}
@@ -165,15 +132,9 @@ export default function SignaturePad({
       onTouchMove={draw}
       onTouchStart={startDrawing}
       ref={canvasRef}
-      height={height ?? 400}
-      width={width ?? 400}
       style={{
         touchAction: "none"
       }}
     />
-    // </div>
   );
-
-
-};
-
+} 

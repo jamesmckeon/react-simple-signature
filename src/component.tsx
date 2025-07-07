@@ -1,17 +1,25 @@
 import React, {
   useRef, useEffect, useState
 } from "react";
-
+import ClearButton from "./ClearButton";
 import "./component.css";
 
 export interface SignaturePadProps {
   onSignatureChange: (blob: Blob) => void;
   height: number | null;
   width: number | null;
+  onCleared?: () => void;
+  clearButtonProps: ClearButtonProps | null;
+}
+
+export interface ClearButtonProps {
+  className: string | null;
+
 }
 
 export default function SignaturePad({
-  onSignatureChange, height, width
+  onSignatureChange, height, width, onCleared,
+  clearButtonProps = null
 }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(false);
@@ -146,7 +154,10 @@ export default function SignaturePad({
           touchAction: "none"
         }}
       />
-      <button type="button" onClick={clearClicked}>&#x2715;</button>
+      {clearButtonProps && <ClearButton
+        className={clearButtonProps?.className}
+type="button"
+onClick={clearClicked}>&#x2715;</ClearButton>}
     </div>
   );
 } 

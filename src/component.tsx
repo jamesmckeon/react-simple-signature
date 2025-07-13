@@ -24,7 +24,8 @@ export default function SignaturePad({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
-  const [lastPoint, setLastPoint] = useState<{ x: number; y: number } | null>(null);
+  const [lastPoint, setLastPoint] = 
+  useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;

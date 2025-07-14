@@ -11,6 +11,8 @@ export interface SignaturePadProps {
   width: number | null;
   className?: string;
   ref?: React.Ref<SignaturePadRef>; 
+  blobFormat?: "png" | "jpeg";
+  strokeColor?: `#${string}`;
 }
 
 export interface SignaturePadRef {
@@ -22,13 +24,21 @@ export default function SignaturePad({
   onSignatureChange,
   height,
   width,
-  className
+  className, blobFormat = "png", strokeColor = "#000"
 }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Tracks whether the user is currently drawing on the canvas
   const [drawing, setDrawing] = useState(false);
+
+  // Tracks whether any drawing has occurred (used to decide if a blob should be emitted)
   const [hasDrawn, setHasDrawn] = useState(false);
+
+  // Stores the last recorded point during drawing,
+  // used to smooth the line using quadratic curves
   const [lastPoint, setLastPoint] =
-    useState<{ x: number; y: number } | null>(null);
+  useState<{ x: number; y: number } | null>(null);
+
 
   useImperativeHandle(ref, () => ({
     clear: () => {
@@ -42,26 +52,37 @@ export default function SignaturePad({
   }));
 
   useEffect(() => {
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Determine device pixel ratio (for HiDPI screens)
     const dpr = window.devicePixelRatio || 1;
+
+    // Use passed-in width/height, or fallback to defaults
     const canvasWidth = width ?? 400;
     const canvasHeight = height ?? 400;
 
+    // Set the actual pixel size of the canvas for high-DPI accuracy
     canvas.width = canvasWidth * dpr;
     canvas.height = canvasHeight * dpr;
+
+    // Set the visible (CSS) size of the canvas
     canvas.style.width = `${canvasWidth}px`;
     canvas.style.height = `${canvasHeight}px`;
+
+    // Scale the drawing context to match the pixel ratio
     ctx.scale(dpr, dpr);
 
+    // Set default drawing styles
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
-    ctx.strokeStyle = "#000";
-  }, [width, height]);
+    ctx.strokeStyle = strokeColor ;
+  }, [width, height, strokeColor]);
+
 
   const startDrawing = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
@@ -100,6 +121,9 @@ export default function SignaturePad({
   };
 
   const endDrawing = () => {
+
+    if (!drawing) return; // prevent double calls
+
     setDrawing(false);
     setLastPoint(null);
 
@@ -144,23 +168,22 @@ export default function SignaturePad({
       if (onSignatureChange && blob) {
         onSignatureChange(blob);
       }
-    }, "image/png");
+    }, `image/${blobFormat}`); 
   };
 
   return (
-    <div className="component">
-      <canvas
-        className={className}
-        onMouseDown={startDrawing}
-        onMouseLeave={endDrawing}
-        onMouseMove={draw}
-        onMouseUp={endDrawing}
-        onTouchEnd={endDrawing}
-        onTouchMove={draw}
-        onTouchStart={startDrawing}
-        ref={canvasRef}
-        style={{ touchAction: "none" }}
-      />
-    </div>
+
+    <canvas
+      className={className}
+      onMouseDown={startDrawing}
+      onMouseMove={draw}
+      onMouseUp={endDrawing}
+      onTouchEnd={endDrawing}
+      onTouchMove={draw}
+      onTouchStart={startDrawing}
+      ref={canvasRef}
+      style={{ touchAction: "none" }}
+    />
+ 
   );
 }

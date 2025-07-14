@@ -1,30 +1,57 @@
-
 import SignaturePad, { type SignaturePadRef } from './SignaturePad'
-import {useRef} from 'react'
+import { useRef, useState, useEffect } from 'react'
 import './App.css'
 
 export default function App() {
   const signatureRef = useRef<SignaturePadRef>(null);
+  const [signatureBlob, setSignatureBlob] = useState<Blob | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const handleClearClick = () => {
     signatureRef.current?.clear();
+    setSignatureBlob(null);
   };
+
+  useEffect(() => {
+    if (!signatureBlob) {
+      setImageUrl(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(signatureBlob);
+    setImageUrl(url);
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [signatureBlob]);
 
   return (
     <div>
       <SignaturePad
-      className='canvas-border'
-        ref={signatureRef}
+        blobFormat='png'
+        className='canvas-border'
         height={300}
-        width={400}
         onSignatureChange={(blob) => {
-          console.log("Signature captured:", blob);
+          setSignatureBlob(blob);
         }}
+        ref={signatureRef}
+        strokeColor='#FF0000'
+        width={400}
       />
 
-      <button type='button'onClick={handleClearClick}>
+      <button onClick={handleClearClick} type='button'>
         ✖ Clear Signature
       </button>
+
+      {imageUrl && (
+        <div style={{ marginTop: '1rem' }}>
+          <strong>Signature Preview:</strong>
+          <img alt="Signature preview"
+            className="signature-preview" 
+            src={imageUrl} />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import storybook from "eslint-plugin-storybook";
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -21,7 +20,6 @@ export default tseslint.config(
         reactRefresh.configs.vite,
         reactX.configs["recommended-typescript"],
         reactDom.configs.recommended,
-        // storybook.configs["flat/recommended"]
       ],
       plugins: {
         "@stylistic": stylistic,
@@ -41,7 +39,8 @@ export default tseslint.config(
         "@typescript-eslint/restrict-template-expressions": ["error", {allowNumber: true}],
         "max-len": ["error", { code: 80, ignoreComments: true }],
         "@stylistic/jsx-max-props-per-line": ["error", { when: "multiline" }],
-      },ignores: ['!.storybook'],
+        "@stylistic/jsx-indent": ["error", 2],
+      }
     },
   ]
 );

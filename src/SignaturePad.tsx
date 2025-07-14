@@ -1,31 +1,45 @@
-import React, {
-  useRef, useEffect, useState
+import {
+  useRef,
+  useEffect,
+  useState,
+  useImperativeHandle
 } from "react";
-import ClearButton from "./ClearButton";
-import "./component.css";
 
 export interface SignaturePadProps {
-  onSignatureChange: (blob: Blob) => void;
+  onSignatureChange?: (blob: Blob) => void;
   height: number | null;
   width: number | null;
-  onCleared?: () => void;
-  clearButtonProps: ClearButtonProps | null;
+  className?: string;
+  ref?: React.Ref<SignaturePadRef>; 
 }
 
-export interface ClearButtonProps {
-  className: string | null;
-
+export interface SignaturePadRef {
+  clear: () => void;
 }
 
 export default function SignaturePad({
-  onSignatureChange, height, width, onCleared,
-  clearButtonProps = null
+  ref,
+  onSignatureChange,
+  height,
+  width,
+  className
 }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
-  const [lastPoint, setLastPoint] = 
-  useState<{ x: number; y: number } | null>(null);
+  const [lastPoint, setLastPoint] =
+    useState<{ x: number; y: number } | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    clear: () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setHasDrawn(false);
+    }
+  }));
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -35,8 +49,8 @@ export default function SignaturePad({
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const canvasWidth = (width ?? 400);
-    const canvasHeight = (height ?? 400);
+    const canvasWidth = width ?? 400;
+    const canvasHeight = height ?? 400;
 
     canvas.width = canvasWidth * dpr;
     canvas.height = canvasHeight * dpr;
@@ -133,16 +147,10 @@ export default function SignaturePad({
     }, "image/png");
   };
 
-  const clearClicked = () => {
-
-    if (!canvasRef.current) return;
-    const ctx = canvasRef.current?.getContext("2d");
-    ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-  }
-
   return (
     <div className="component">
       <canvas
+        className={className}
         onMouseDown={startDrawing}
         onMouseLeave={endDrawing}
         onMouseMove={draw}
@@ -151,14 +159,8 @@ export default function SignaturePad({
         onTouchMove={draw}
         onTouchStart={startDrawing}
         ref={canvasRef}
-        style={{
-          touchAction: "none"
-        }}
+        style={{ touchAction: "none" }}
       />
-      {clearButtonProps && <ClearButton
-        className={clearButtonProps?.className}
-type="button"
-onClick={clearClicked}>&#x2715;</ClearButton>}
     </div>
   );
-} 
+}

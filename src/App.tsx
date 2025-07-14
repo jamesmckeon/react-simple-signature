@@ -1,20 +1,30 @@
-import { useState } from 'react'
-import Component from './component.tsx'
-import './app.css'
 
-function App() {
-  const [signature, setSignature] = useState<Blob | null>(null);
-  return (<>
+import SignaturePad, { type SignaturePadRef } from './SignaturePad'
+import {useRef} from 'react'
+import './App.css'
 
-    {/* {signature !== null && <img src={URL.createObjectURL(signature!)} />} */}
+export default function App() {
+  const signatureRef = useRef<SignaturePadRef>(null);
 
-    <div className="component-container">
-      <Component onSignatureChange={setSignature} />
-    </div >
-    {/* {signature !== null && <img src={URL.createObjectURL(signature!)} />
-    } */}
-  </>
-  )
+  const handleClearClick = () => {
+    signatureRef.current?.clear();
+  };
+
+  return (
+    <div>
+      <SignaturePad
+      className='canvas-border'
+        ref={signatureRef}
+        height={300}
+        width={400}
+        onSignatureChange={(blob) => {
+          console.log("Signature captured:", blob);
+        }}
+      />
+
+      <button type='button'onClick={handleClearClick}>
+        ✖ Clear Signature
+      </button>
+    </div>
+  );
 }
-
-export default App

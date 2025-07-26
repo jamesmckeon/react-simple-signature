@@ -124,6 +124,6 @@ MIT
 
 ## 👤 Author
 
-Maintained by [your-name-or-github-link].
+Maintained by [jamesmckeon](https://github.com/jamesmckeon).
 
 ---

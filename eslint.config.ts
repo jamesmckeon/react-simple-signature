@@ -7,10 +7,7 @@ import reactX from 'eslint-plugin-react-x'
 import reactDom from 'eslint-plugin-react-dom'
 import { globalIgnores } from 'eslint/config'
 import stylistic from '@stylistic/eslint-plugin'
-import * as jsxA11y from 'eslint-plugin-jsx-a11y';
-import type { ESLint } from 'eslint'
-
-const typedJsxA11y = jsxA11y as ESLint.Plugin;
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 export default tseslint.config([
   globalIgnores(['dist']),
@@ -23,10 +20,11 @@ export default tseslint.config([
       reactRefresh.configs.vite,
       reactX.configs['recommended-typescript'],
       reactDom.configs.recommended,
+      
     ],
     plugins: {
       '@stylistic': stylistic,
-      'jsx-a11y': typedJsxA11y,
+      'jsx-a11y': jsxA11y,
     },
     languageOptions: {
       parserOptions: {
@@ -37,8 +35,7 @@ export default tseslint.config([
       globals: globals.browser,
     },
     rules: {
-      ...(typedJsxA11y.configs.recommended.rules as Record<string, unknown>),
-      // Note: you must disable the base rule as it can report incorrect errors
+      ...jsxA11y.configs.recommended.rules,
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/restrict-template-expressions': 

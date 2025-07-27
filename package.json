@@ -4,21 +4,22 @@
   "version": "1.0.0",
   "type": "module",
   "files": [
-  "src",
-  "dist/index.js",
-  "dist/index.d.ts"
-],
-"main": "dist/index.js",
-"types": "dist/index.d.ts",
+    "src",
+    "dist/index.js",
+    "dist/index.d.ts"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "dev:example": "vite --config vite.config.example.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "lint-fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "preview": "vite preview",
-    "test": "vitest --ui",
-    "deploy": "npm run build && gh-pages -d dist"
+    "test": "vitest",
+    "dev:example": "vite --config vite.config.example.ts",
+    "build:example": "vite build --config vite.config.example.ts",
+    "deploy": "npm run build:example && gh-pages -d dist"
   },
   "dependencies": {
     "@types/node": "^24.0.10",

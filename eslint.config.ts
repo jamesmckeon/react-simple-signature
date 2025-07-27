@@ -8,6 +8,7 @@ import reactDom from 'eslint-plugin-react-dom'
 import { globalIgnores } from 'eslint/config'
 import stylistic from '@stylistic/eslint-plugin'
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import { error } from 'console'
 
 export default tseslint.config([
   globalIgnores(['dist']),
@@ -44,7 +45,8 @@ export default tseslint.config([
       '@stylistic/indent': ['error', 2],
       '@stylistic/jsx-sort-props': 'error',
       '@stylistic/spaced-comment': ['error', 'always'],
-      "@stylistic/jsx-max-props-per-line": "error"
+      "@stylistic/jsx-max-props-per-line": "error",
+      "@stylistic/object-curly-newline": ["error", "always"]
     },
   },
 

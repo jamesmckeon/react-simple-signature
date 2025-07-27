@@ -5,9 +5,11 @@ import {
   useImperativeHandle,
 } from "react";
 
-import type { Ref, 
+import type {
+  Ref, 
   MouseEvent,
-  TouchEvent } from "react";
+  TouchEvent 
+} from "react";
 
 export interface SignaturePadProps {
   onSignatureChange?: (blob: Blob) => void;
@@ -41,7 +43,9 @@ export default function SignaturePad({
   // Stores the last recorded point during drawing,
   // used to smooth the line using quadratic curves
   const [lastPoint, setLastPoint] =
-  useState<{ x: number; y: number } | null>(null);
+  useState<{
+    x: number; y: number 
+  } | null>(null);
 
 
   useImperativeHandle(ref, () => ({
@@ -95,7 +99,9 @@ export default function SignaturePad({
 
     if(position === null) return; 
 
-    const { offsetX, offsetY } = position;
+    const {
+      offsetX, offsetY 
+    } = position;
     
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
@@ -104,7 +110,9 @@ export default function SignaturePad({
     ctx.moveTo(offsetX, offsetY);
     setDrawing(true);
     setHasDrawn(false);
-    setLastPoint({ x: offsetX, y: offsetY });
+    setLastPoint({
+      x: offsetX, y: offsetY 
+    });
   };
 
   const draw = (
@@ -115,7 +123,9 @@ export default function SignaturePad({
     const position = getEventPosition(e);
     if (!position || !lastPoint) return;
 
-    const { offsetX, offsetY } = position;
+    const {
+      offsetX, offsetY 
+    } = position;
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
 
@@ -125,7 +135,9 @@ export default function SignaturePad({
     ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midX, midY);
     ctx.stroke();
 
-    setLastPoint({ x: offsetX, y: offsetY });
+    setLastPoint({
+      x: offsetX, y: offsetY 
+    });
     setHasDrawn(true);
   };
 
@@ -148,7 +160,9 @@ export default function SignaturePad({
 
   const getEventPosition = (
     e: TouchEvent<HTMLCanvasElement> | MouseEvent<HTMLCanvasElement>
-  ):{offsetX:number, offsetY:number}|null => {
+  ):{
+    offsetX:number, offsetY:number
+  }|null => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
 
@@ -185,13 +199,17 @@ export default function SignaturePad({
     <canvas
       className={className}
       onMouseDown={startDrawing}
+      onMouseLeave={endDrawing} // end drawing when user leaves canvas
       onMouseMove={draw}
       onMouseUp={endDrawing}
-      onTouchEnd={endDrawing}
+      onTouchCancel={endDrawing}
+      onTouchEnd={endDrawing} 
       onTouchMove={draw}
       onTouchStart={startDrawing}
       ref={canvasRef}
-      style={{ touchAction: "none" }}
+      style={{
+        touchAction: "none" 
+      }}
     />
  
   );

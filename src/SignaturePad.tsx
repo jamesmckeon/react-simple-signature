@@ -2,15 +2,19 @@ import {
   useRef,
   useEffect,
   useState,
-  useImperativeHandle
+  useImperativeHandle,
 } from "react";
+
+import type { Ref, 
+  MouseEvent,
+  TouchEvent } from "react";
 
 export interface SignaturePadProps {
   onSignatureChange?: (blob: Blob) => void;
   height: number | null;
   width: number | null;
   className?: string;
-  ref?: React.Ref<SignaturePadRef>; 
+  ref?: Ref<SignaturePadRef>; 
   blobFormat?: "png" | "jpeg";
   strokeColor?: `#${string}`;
 }
@@ -87,7 +91,12 @@ export default function SignaturePad({
   const startDrawing = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
-    const { offsetX, offsetY } = getEventPosition(e);
+    const position = getEventPosition(e);
+
+    if(position === null) return; 
+
+    const { offsetX, offsetY } = position;
+    
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
 
@@ -99,7 +108,7 @@ export default function SignaturePad({
   };
 
   const draw = (
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+    e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>
   ) => {
     if (!drawing) return;
 
@@ -138,8 +147,8 @@ export default function SignaturePad({
   };
 
   const getEventPosition = (
-    e: React.TouchEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>
-  ) => {
+    e: TouchEvent<HTMLCanvasElement> | MouseEvent<HTMLCanvasElement>
+  ):{offsetX:number, offsetY:number}|null => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
 

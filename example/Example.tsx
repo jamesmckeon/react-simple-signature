@@ -1,8 +1,9 @@
-import SignaturePad, { type SignaturePadRef } from './component/SignaturePad'
+import SignaturePad, { type SignaturePadRef } from '../src/component/SignaturePad'
 import { useRef, useState, useEffect } from 'react'
-import './App.css'
 
-export default function App() {
+import './example.css'
+
+export default function Example() {
   const signatureRef = useRef<SignaturePadRef>(null);
   const [signatureBlob, setSignatureBlob] = useState<Blob | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -40,10 +41,11 @@ export default function App() {
         width={400}
       />
 
-      <button className='clear-button'
+      <button 
+        className='btn btn-outline-secondary'
         onClick={handleClearClick}
         type='button'>
-        ✖ Clear
+        Clear
       </button>
 
       {imageUrl && (
@@ -53,7 +55,7 @@ export default function App() {
             className="signature-preview" 
             src={imageUrl} />
         </div>
-      )}
+      )} 
     </div>
   );
 }

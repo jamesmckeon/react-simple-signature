@@ -7,6 +7,10 @@ import reactX from 'eslint-plugin-react-x'
 import reactDom from 'eslint-plugin-react-dom'
 import { globalIgnores } from 'eslint/config'
 import stylistic from '@stylistic/eslint-plugin'
+import * as jsxA11y from 'eslint-plugin-jsx-a11y';
+import type { ESLint } from 'eslint'
+
+const typedJsxA11y = jsxA11y as ESLint.Plugin;
 
 export default tseslint.config([
   globalIgnores(['dist']),
@@ -22,6 +26,7 @@ export default tseslint.config([
     ],
     plugins: {
       '@stylistic': stylistic,
+      'jsx-a11y': typedJsxA11y,
     },
     languageOptions: {
       parserOptions: {
@@ -32,15 +37,17 @@ export default tseslint.config([
       globals: globals.browser,
     },
     rules: {
+      ...(typedJsxA11y.configs.recommended.rules as Record<string, unknown>),
       // Note: you must disable the base rule as it can report incorrect errors
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'error',
-      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+      '@typescript-eslint/restrict-template-expressions': 
+      ['error', { allowNumber: true }],
       'max-len': ['error', { code: 80, ignoreComments: true }],
-      '@stylistic/jsx-max-props-per-line': ['error', { when: 'multiline' }],
       '@stylistic/indent': ['error', 2],
       '@stylistic/jsx-sort-props': 'error',
       '@stylistic/spaced-comment': ['error', 'always'],
+      "@stylistic/jsx-max-props-per-line": "error"
     },
   },
 

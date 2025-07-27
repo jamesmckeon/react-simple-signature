@@ -3,9 +3,7 @@ import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import dts from "vite-plugin-dts";
-// import { fileURLToPath } from 'node:url';
-// const dirname = typeof __dirname !== 'undefined' ? __dirname : 
-//   path.dirname(fileURLToPath(import.meta.url));
+
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
@@ -43,16 +41,9 @@ export default defineConfig({
     projects: [{
       extends: true,
       test: {
-        name: 'storybook',
-        browser: {
-          enabled: true,
-          headless: true,
-          provider: 'playwright',
-          instances: [{
-            browser: 'chromium'
-          }]
-        }
+        environment: 'jsdom',
       }
-    }]
+    }
+    ]
   }
 });

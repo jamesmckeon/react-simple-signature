@@ -1,4 +1,4 @@
-import SignaturePad, { type SignaturePadRef } from './SignaturePad'
+import SignaturePad, { type SignaturePadRef } from './component/SignaturePad'
 import { useRef, useState, useEffect } from 'react'
 import './App.css'
 
@@ -40,12 +40,14 @@ export default function App() {
         width={400}
       />
 
-      <button onClick={handleClearClick} type='button'>
-        ✖ Clear Signature
+      <button className='clear-button'
+        onClick={handleClearClick}
+        type='button'>
+        ✖ Clear
       </button>
 
       {imageUrl && (
-        <div style={{ marginTop: '1rem' }}>
+        <div  style={{ marginTop: '1rem' , width: '400px'}}>
           <strong>Signature Preview:</strong>
           <img alt="Signature preview"
             className="signature-preview" 

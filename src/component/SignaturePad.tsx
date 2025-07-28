@@ -11,6 +11,8 @@ import type {
   TouchEvent 
 } from "react";
 
+import useInit from "./useInit";
+
 export interface SignaturePadProps {
   onSignatureChange?: (blob: Blob) => void;
   height: number | null;
@@ -32,6 +34,7 @@ export default function SignaturePad({
   width,
   className, blobFormat = "png", strokeColor = "#000"
 }: SignaturePadProps) {
+ 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Tracks whether the user is currently drawing on the canvas
@@ -47,6 +50,9 @@ export default function SignaturePad({
     x: number; y: number 
   } | null>(null);
 
+  useInit({
+    height, width, strokeColor, canvasRef
+  });
 
   useImperativeHandle(ref, () => ({
     clear: () => {
@@ -59,37 +65,7 @@ export default function SignaturePad({
     }
   }));
 
-  useEffect(() => {
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Determine device pixel ratio (for HiDPI screens)
-    const dpr = window.devicePixelRatio || 1;
-
-    // Use passed-in width/height, or fallback to defaults
-    const canvasWidth = width ?? 400;
-    const canvasHeight = height ?? 400;
-
-    // Set the actual pixel size of the canvas for high-DPI accuracy
-    canvas.width = canvasWidth * dpr;
-    canvas.height = canvasHeight * dpr;
-
-    // Set the visible (CSS) size of the canvas
-    canvas.style.width = `${canvasWidth}px`;
-    canvas.style.height = `${canvasHeight}px`;
-
-    // Scale the drawing context to match the pixel ratio
-    ctx.scale(dpr, dpr);
-
-    // Set default drawing styles
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = strokeColor ;
-  }, [width, height, strokeColor]);
 
 
   const startDrawing = (
@@ -197,19 +173,22 @@ export default function SignaturePad({
   return (
 
     <canvas
+      aria-label="Signature pad. Draw your signature using mouse or touch."
       className={className}
       onMouseDown={startDrawing}
       onMouseLeave={endDrawing} // end drawing when user leaves canvas
       onMouseMove={draw}
       onMouseUp={endDrawing}
       onTouchCancel={endDrawing}
-      onTouchEnd={endDrawing} 
+      onTouchEnd={endDrawing}
       onTouchMove={draw}
-      onTouchStart={startDrawing}
+      onTouchStart={startDrawing} 
       ref={canvasRef}
+      role="img"
       style={{
         touchAction: "none" 
       }}
+      tabIndex={0}
     />
  
   );

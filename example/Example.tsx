@@ -1,6 +1,10 @@
-import SignaturePad, { type SignaturePadRef } 
+import SignaturePad, {
+  type SignaturePadRef 
+} 
   from '../src/component/SignaturePad'
-import { useRef, useState, useEffect } from 'react'
+import {
+  useRef, useState, useEffect 
+} from 'react'
 
 import './example.css'
 
@@ -32,7 +36,9 @@ export default function Example() {
   return (
     <div className='mt-5 d-flex flex-column align-items-center'>
       <div className='mb-3 input-group '
-        style={{ width: '200px' }}>
+        style={{
+          width: '200px' 
+        }}>
         <div className='input-group-prepend'>
           <span className='input-group-text'>Stroke Color</span>
         </div>
@@ -60,7 +66,9 @@ export default function Example() {
       </button>
 
       {imageUrl && (
-        <div  style={{ marginTop: '1rem' , width: '400px'}}>
+        <div  style={{
+          marginTop: '1rem' , width: '400px'
+        }}>
           <strong>Signature Preview:</strong>
           <img alt="Signature preview"
             className="signature-preview" 

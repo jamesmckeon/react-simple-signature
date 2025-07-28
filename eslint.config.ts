@@ -5,10 +5,11 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import reactX from 'eslint-plugin-react-x'
 import reactDom from 'eslint-plugin-react-dom'
-import { globalIgnores } from 'eslint/config'
+import {
+  globalIgnores 
+} from 'eslint/config'
 import stylistic from '@stylistic/eslint-plugin'
 import jsxA11y from 'eslint-plugin-jsx-a11y';
-import { error } from 'console'
 
 export default tseslint.config([
   globalIgnores(['dist']),
@@ -36,12 +37,17 @@ export default tseslint.config([
       globals: globals.browser,
     },
     rules: {
-      ...jsxA11y.configs.recommended.rules,
+      ...(jsxA11y?.configs?.recommended?.rules ?? {
+      }),
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/restrict-template-expressions': 
-      ['error', { allowNumber: true }],
-      'max-len': ['error', { code: 80, ignoreComments: true }],
+      ['error', {
+        allowNumber: true 
+      }],
+      'max-len': ['error', {
+        code: 80, ignoreComments: true 
+      }],
       '@stylistic/indent': ['error', 2],
       '@stylistic/jsx-sort-props': 'error',
       '@stylistic/spaced-comment': ['error', 'always'],

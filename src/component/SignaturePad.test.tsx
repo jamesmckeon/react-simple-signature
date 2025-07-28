@@ -1,13 +1,23 @@
-import { it, expect, vi, beforeAll } from 'vitest'
-import { render, fireEvent, screen, waitFor } from '@testing-library/react'
-import { useRef, type ComponentPropsWithoutRef } from 'react'
-import SignaturePad, {type SignaturePadRef} from './SignaturePad'
+import {
+  it, expect, vi, beforeAll 
+} from 'vitest'
+import {
+  render, fireEvent, screen, waitFor 
+} from '@testing-library/react'
+import {
+  useRef, type ComponentPropsWithoutRef 
+} from 'react'
+import SignaturePad, {
+  type SignaturePadRef
+} from './SignaturePad'
 
 // Stub for HTMLCanvasElement.toBlob (since it's async and may not be implemented in JSDOM)
 beforeAll(() => {
   Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
     value: function (callback: (blob: Blob) => void) {
-      const blob = new Blob(['fake image'], { type: 'image/png' })
+      const blob = new Blob(['fake image'], {
+        type: 'image/png' 
+      })
       callback(blob)
     },
     configurable: true
@@ -47,10 +57,16 @@ it('calls onSignatureChange after drawing', async () => {
 
   const canvas = screen.getByRole('presentation') ;
  
-  const { left, top } = canvas.getBoundingClientRect()
+  const {
+    left, top 
+  } = canvas.getBoundingClientRect()
 
-  fireEvent.mouseDown(canvas, { clientX: left + 10, clientY: top + 10 })
-  fireEvent.mouseMove(canvas, { clientX: left + 30, clientY: top + 30 })
+  fireEvent.mouseDown(canvas, {
+    clientX: left + 10, clientY: top + 10 
+  })
+  fireEvent.mouseMove(canvas, {
+    clientX: left + 30, clientY: top + 30 
+  })
   fireEvent.mouseUp(canvas)
 
   await waitFor(() => {
@@ -59,7 +75,9 @@ it('calls onSignatureChange after drawing', async () => {
 })
 
 it('clears the canvas when calling ref.clear()', () => {
-  const { getByTestId } = render(
+  const {
+    getByTestId 
+  } = render(
     <SignaturePadWithRef height={100}
       width={100} />
   )

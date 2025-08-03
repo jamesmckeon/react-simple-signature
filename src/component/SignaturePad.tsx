@@ -1,22 +1,18 @@
 import {
-  useRef,
-  useEffect,
-  useState,
   useImperativeHandle,
 } from "react";
 
 import type {
-  Ref, 
-  MouseEvent,
-  TouchEvent 
+  Ref
 } from "react";
 
 import useInit from "./useInit";
+import useDraw from './useDraw';
 
 export interface SignaturePadProps {
   onSignatureChange?: (blob: Blob) => void;
-  height: number | null;
-  width: number | null;
+  height?: number ;
+  width?: number ;
   className?: string;
   ref?: Ref<SignaturePadRef>; 
   blobFormat?: "png" | "jpeg";
@@ -32,26 +28,19 @@ export default function SignaturePad({
   onSignatureChange,
   height,
   width,
-  className, blobFormat = "png", strokeColor = "#000"
+  className, 
+  blobFormat = "png", 
+  strokeColor = "#000"
 }: SignaturePadProps) {
- 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Tracks whether the user is currently drawing on the canvas
-  const [drawing, setDrawing] = useState(false);
-
-  // Tracks whether any drawing has occurred (used to decide if a blob should be emitted)
-  const [hasDrawn, setHasDrawn] = useState(false);
-
-  // Stores the last recorded point during drawing,
-  // used to smooth the line using quadratic curves
-  const [lastPoint, setLastPoint] =
-  useState<{
-    x: number; y: number 
-  } | null>(null);
+  const {
+    draw, canvasRef,  setHasDrawn, endDrawing, startDrawing
+  } = useDraw({
+    onSignatureChange, blobFormat
+  });
 
   useInit({
-    height, width, strokeColor, canvasRef
+    height, width, strokeColor,canvasRef
   });
 
   useImperativeHandle(ref, () => ({
@@ -65,113 +54,7 @@ export default function SignaturePad({
     }
   }));
 
-
-
-
-  const startDrawing = (
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
-  ) => {
-    const position = getEventPosition(e);
-
-    if(position === null) return; 
-
-    const {
-      offsetX, offsetY 
-    } = position;
-    
-    const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) return;
-
-    ctx.beginPath();
-    ctx.moveTo(offsetX, offsetY);
-    setDrawing(true);
-    setHasDrawn(false);
-    setLastPoint({
-      x: offsetX, y: offsetY 
-    });
-  };
-
-  const draw = (
-    e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>
-  ) => {
-    if (!drawing) return;
-
-    const position = getEventPosition(e);
-    if (!position || !lastPoint) return;
-
-    const {
-      offsetX, offsetY 
-    } = position;
-    const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) return;
-
-    const midX = (lastPoint.x + offsetX) / 2;
-    const midY = (lastPoint.y + offsetY) / 2;
-
-    ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midX, midY);
-    ctx.stroke();
-
-    setLastPoint({
-      x: offsetX, y: offsetY 
-    });
-    setHasDrawn(true);
-  };
-
-  const endDrawing = () => {
-
-    if (!drawing) return; // prevent double calls
-
-    setDrawing(false);
-    setLastPoint(null);
-
-    const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) return;
-
-    ctx.closePath();
-
-    if (hasDrawn) {
-      emitBlob();
-    }
-  };
-
-  const getEventPosition = (
-    e: TouchEvent<HTMLCanvasElement> | MouseEvent<HTMLCanvasElement>
-  ):{
-    offsetX:number, offsetY:number
-  }|null => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-
-    let clientX, clientY;
-
-    if ("touches" in e) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-
-    const rectangle = canvas.getBoundingClientRect();
-
-    return {
-      offsetX: clientX - rectangle.left,
-      offsetY: clientY - rectangle.top,
-    };
-  };
-
-  const emitBlob = () => {
-    if (!canvasRef.current) return;
-
-    canvasRef.current.toBlob((blob) => {
-      if (onSignatureChange && blob) {
-        onSignatureChange(blob);
-      }
-    }, `image/${blobFormat}`); 
-  };
-
   return (
-
     <canvas
       aria-label="Signature pad. Draw your signature using mouse or touch."
       className={className}

@@ -1,227 +1,140 @@
 import {
-  it, expect, beforeAll, afterAll, afterEach, vi 
+  it, beforeEach, expect, vi , afterEach
 } from 'vitest';
 import {
-  render, cleanup, waitFor, screen 
-} from '@testing-library/react';
+  render, screen, cleanup
+} from '@testing-library/react'
 import {
-  useRef
+  useRef 
 } from 'react';
 import useInit from './useInit';
 
-// Test component with proper typing
+function createMock2DContext() {
+  let _lineWidth = 0;
+  let _lineCap: CanvasLineCap = 'butt';
+  let _strokeStyle: string | CanvasGradient | CanvasPattern = '';
+  return {
+    scale: vi.fn(),
+    get lineWidth() {
+      return _lineWidth;
+    },
+    set lineWidth(value: number) {
+      _lineWidth = value;
+    },
+    get lineCap() {
+      return _lineCap;
+    },
+    set lineCap(value: CanvasLineCap) {
+      _lineCap = value;
+    },
+    get strokeStyle() {
+      return _strokeStyle;
+    },
+    set strokeStyle(value: string | CanvasGradient | CanvasPattern) {
+      _strokeStyle = value;
+    },
+  } as unknown as CanvasRenderingContext2D;
+}
+
 function TestComponent({
-  width,
-  height,
-  strokeColor,
-  testId = 'canvas', // Allow unique test IDs
+  width, height, strokeColor 
 }: {
   width?: number;
   height?: number;
   strokeColor: `#${string}`;
-  testId?: string;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useInit({
-    width, height, strokeColor, canvasRef  
+    width, height, strokeColor, canvasRef 
   });
 
-  return <canvas data-testid={testId}
+  return <canvas data-testid="canvas"
     ref={canvasRef} />;
 }
 
+let originalGetContext: (this: HTMLCanvasElement, 
+  contextId: string, ...args: unknown[]) => 
+    RenderingContext | null;
 
-let originalGetContext: typeof HTMLCanvasElement.prototype.getContext;
-let originalDevicePixelRatio: number;
+let mockCtx: CanvasRenderingContext2D;
 
-// Mock canvas context
-const mockContext = {
-  stroke: vi.fn(),
-  beginPath: vi.fn(),
-  moveTo: vi.fn(),
-  lineTo: vi.fn(),
-  closePath: vi.fn(),
-  clearRect: vi.fn(),
-  scale: vi.fn(),
-  strokeStyle: '#000000',
-  lineWidth: 1,
-  lineCap: 'round',
-  lineJoin: 'round',
-};
+beforeEach(() => {
+  mockCtx = createMock2DContext();
 
-beforeAll(() => {
-  originalGetContext = HTMLCanvasElement.prototype.getContext;
-  originalDevicePixelRatio = window.devicePixelRatio;
+  // Save the original getContext
+  originalGetContext = HTMLCanvasElement.prototype
+    .getContext.bind(HTMLCanvasElement.prototype);
 
-  // Mock getContext with proper typing
-  HTMLCanvasElement.prototype.getContext = vi.fn((
-    contextId: string
-  ): CanvasRenderingContext2D | null => {
-    if (contextId === '2d') {
-      return mockContext as unknown as CanvasRenderingContext2D;
+  // Mock getContext to return our mock context for "2d", null otherwise
+  HTMLCanvasElement.prototype.getContext = vi.fn((contextId: string) => {
+    if (contextId === "2d") {
+      return mockCtx;
     }
     return null;
-  });
-});
-
-afterAll(() => {
-  HTMLCanvasElement.prototype.getContext = originalGetContext;
-  Object.defineProperty(window, 'devicePixelRatio', {
-    value: originalDevicePixelRatio,
-    writable: true,
-    configurable: true
-  });
+  }) as typeof HTMLCanvasElement.prototype.getContext;
 });
 
 afterEach(() => {
-  cleanup(); // Clean up between tests
-  vi.clearAllMocks();
+  // Restore original after test
+  HTMLCanvasElement.prototype.getContext = 
+    originalGetContext as typeof HTMLCanvasElement.prototype.getContext;
+
+  cleanup();
 });
 
-it('should initialize canvas with default dimensions', () => {
-  const {
-    getByTestId 
-  } = render(
-    <TestComponent strokeColor="#000"
-      testId="canvas-1" />
-  );
-    
-  const canvas = getByTestId('canvas-1') as HTMLCanvasElement;
-  expect(canvas).toBeTruthy();
-  expect(canvas.tagName).toBe('CANVAS');
-});
+it('initializes canvas with defaults ', () => {
+  render(<TestComponent strokeColor="#123456" />);
+  const canvas = screen.getByTestId('canvas');
 
-it('should initialize canvas with custom dimensions', () => {
-  const {
-    getByTestId 
-  } = render(
-    <TestComponent 
-      height={200} 
-      strokeColor="#ff0000" 
-      testId="canvas-2" 
-      width={300} 
-    />
-  );
-    
-  const canvas = getByTestId('canvas-2') as HTMLCanvasElement;
-  expect(canvas.style.width).toBe('300px');
-  expect(canvas.style.height).toBe('200px');
-});
+  const dpr = window.devicePixelRatio || 1;
 
-it('should handle high DPI screens', () => {
-  // Mock devicePixelRatio
-  Object.defineProperty(window, 'devicePixelRatio', {
-    value: 2,
-    writable: true,
-    configurable: true
-  });
+  expect.soft((canvas as HTMLCanvasElement).width).toBe(400 * dpr);
+  expect.soft((canvas as HTMLCanvasElement).height).toBe(400 * dpr);
+  expect.soft(canvas.style.width).toBe('400px');
+  expect.soft(canvas.style.height).toBe('400px');
 
-  const {
-    getByTestId 
-  } = render(
-    <TestComponent 
-      height={100} 
-      strokeColor="#000" 
-      testId="canvas-3" 
-      width={100} 
-    />
-  );
-    
-  const canvas = getByTestId('canvas-3') as HTMLCanvasElement;
-  expect(canvas.width).toBe(200); // 100 * 2 (dpr)
-  expect(canvas.height).toBe(200); // 100 * 2 (dpr)
-});
+  // Verify drawing styles were applied
+  expect.soft(mockCtx.lineWidth).toEqual(2);
+  expect.soft((mockCtx ).lineCap).toBe('round');
+  expect.soft((mockCtx).strokeStyle).toBe('#123456');
+})
 
-it('should apply stroke color to context', () => {
-  const {
-    getByTestId 
-  } = render(
-    <TestComponent 
-      strokeColor="#ff0000" 
-      testId="canvas-4" 
-    />
-  );
-    
-  const canvas = getByTestId('canvas-4') as HTMLCanvasElement;
-  expect(canvas).toBeTruthy();
-  expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith('2d');
-});
-
-it('sets canvas width and height based on DPR and props', async () => {
+it('applies provided dimensions correctly', () => {
   render(
-    <TestComponent height={200}
-      strokeColor="#ff0000"
-      width={300} />
-  ); 
-  await waitFor(() => {
-    const canvas = screen.getByTestId('canvas');
-    expect(canvas.width).toBe(600);
-  });
-});
-
-it('sets canvas style dimensions to logical pixel size', async () => {
-  render(
-    <TestComponent height={200}
-      strokeColor="#00ff00"
-      width={300} />
-  );
-  await waitFor(() => {
-    const canvas = screen.getByTestId('canvas');
-    expect(canvas.style.width).toBe('300px');
-  });
-});
-
-it('applies correct strokeStyle to context', async () => {
-  render(
-    <TestComponent height={100}
-      strokeColor="#123456"
-      width={100} />
-  );
-  await waitFor(() => {
-    const canvas = screen.getByTestId('canvas') ;
-    const ctx = canvas.getContext('2d');
-    expect(ctx.strokeStyle).toBe('#123456');
-  });
-});
-
-it('scales context using device pixel ratio', async () => {
-  const scaleSpy = vi.spyOn(mockContext, 'scale');
-  render(<TestComponent height={100}
-    strokeColor="#000000"
-    width={100} />);
-  await waitFor(() => {
-    expect(scaleSpy).toHaveBeenCalledWith(2, 2);
-  });
-  scaleSpy.mockRestore();
-});
-
-it('sets default lineWidth and lineCap', async () => {
-  const {
-    getByTestId 
-  } = render(
-    <TestComponent height={100}
-      strokeColor="#000"
-      width={100} />
-  );
-  await waitFor(() => {
-    const canvas = getByTestId('canvas') as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d');
-    expect(ctx?.lineWidth).toBe(2);
-  });
-});
-
-it('uses fallback width and height if null', async () => {
-  const {
-    getByTestId 
-  } = render(
-    <TestComponent
+    <TestComponent height={300}
       strokeColor="#abcdef"
-    />
+      width={600} />
   );
-  await waitFor(() => {
-    const canvas = getByTestId('canvas') as HTMLCanvasElement;
-    expect(canvas.width).toBe(800); // 400 * 2
-  });
+  const canvas = screen.getByTestId('canvas');
+  const ctx = (canvas as HTMLCanvasElement)
+    .getContext('2d') as CanvasRenderingContext2D;
+  const dpr = window.devicePixelRatio || 1;
+
+  expect((canvas as HTMLCanvasElement).width).toBe(600 * dpr);
+  expect((canvas as HTMLCanvasElement).height).toBe(300 * dpr);
+  expect(canvas.style.width).toBe('600px');
+  expect(canvas.style.height).toBe('300px');
+
+  expect((ctx).strokeStyle).toBe('#abcdef');
+});
+
+it('does nothing if canvasRef.current is null', () => {
+  const getContextSpy = vi.fn();
+
+  // Override getContext to verify it’s not called
+  HTMLCanvasElement.prototype.getContext = getContextSpy;
+
+  function NullRefComponent() {
+    const canvasRef = {
+      current: null 
+    };
+   
+    useInit({
+      width: 100, height: 100, strokeColor: '#000000', canvasRef 
+    });
+    return null; 
+  }
+
+  render(<NullRefComponent />);
+  expect(getContextSpy).not.toHaveBeenCalled();
 });

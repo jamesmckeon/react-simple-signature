@@ -1,0 +1,2 @@
+
+import 'jest-canvas-mock';

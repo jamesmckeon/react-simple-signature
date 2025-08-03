@@ -1,12 +1,12 @@
 import {
-  useEffect
+  useEffect, type RefObject
 } from "react";
   
 interface hookProps{
-  height?: number; // Make optional instead of nullable
-  width?: number;  // Make optional instead of nullable
+  height?: number; 
+  width?: number;  
   strokeColor: `#${string}`;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: RefObject<HTMLCanvasElement|null> ; // Allow null for initial render
 }
   
 export default function useInit({
@@ -15,11 +15,11 @@ export default function useInit({
 
   useEffect(() => {
 
-    const canvas = canvasRef?.current;
-
-    if(!canvas) 
+    if (canvasRef.current === null) 
       return;
 
+    const canvas = canvasRef.current;
+   
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 

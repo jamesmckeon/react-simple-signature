@@ -3,7 +3,8 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2023",
     "lib": [
-      "ES2023"
+      "ES2023",
+      "dom"
     ],
     "module": "ESNext",
     "skipLibCheck": true,
@@ -24,6 +25,7 @@
   "include": [
     "vite.config.ts",
     "eslint.config.ts",
-    "vite.config.*.ts"
+    "vite.config.*.ts",
+    "./test/setup.ts"
   ]
 }

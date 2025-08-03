@@ -1,11 +1,11 @@
 import {
-  describe, it, expect, beforeAll, afterAll, afterEach, vi 
+  it, expect, beforeAll, afterAll, afterEach, vi 
 } from 'vitest';
 import {
   render, cleanup, waitFor, screen 
 } from '@testing-library/react';
 import {
-  useRef, type FC 
+  useRef
 } from 'react';
 import useInit from './useInit';
 
@@ -23,8 +23,9 @@ function TestComponent({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
+
   useInit({
-    width, height, strokeColor, canvasRef 
+    width, height, strokeColor, canvasRef  
   });
 
   return <canvas data-testid={testId}
@@ -186,7 +187,7 @@ it('applies correct strokeStyle to context', async () => {
 });
 
 it('scales context using device pixel ratio', async () => {
-  const scaleSpy = vi.spyOn(CanvasRenderingContext2D.prototype, 'scale');
+  const scaleSpy = vi.spyOn(mockContext, 'scale');
   render(<TestComponent height={100}
     strokeColor="#000000"
     width={100} />);
@@ -215,9 +216,9 @@ it('uses fallback width and height if null', async () => {
   const {
     getByTestId 
   } = render(
-    <TestComponent height={null}
+    <TestComponent
       strokeColor="#abcdef"
-      width={null} />
+    />
   );
   await waitFor(() => {
     const canvas = getByTestId('canvas') as HTMLCanvasElement;

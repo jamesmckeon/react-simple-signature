@@ -8,14 +8,15 @@ import type {
 } from "react";
 
 interface useDrawProps {
-  onSignatureChange?: (blob: Blob) => void;
+  onChange?: (blob: Blob) => void;
+  onStart?: () => void;
   blobFormat?: "png" | "jpeg";
 }
 
 // Custom hook for managing drawing behavior on a canvas, 
 // including tracking state and emitting an image blob when drawing ends.
-export default function useDray({
-  onSignatureChange, blobFormat
+export default function useDraw({
+  onChange, blobFormat, onStart
 }: useDrawProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -105,15 +106,18 @@ export default function useDray({
     setLastPoint({
       x: offsetX, y: offsetY 
     });
+
+    if( onStart)
+      onStart();
   };
 
   // Emits the current canvas content as a Blob using the specified image format
   const emitBlob = () => {
-    if (!canvasRef.current || !onSignatureChange) return;
+    if (!canvasRef.current || !onChange) return;
 
     canvasRef.current.toBlob((blob) => {
       if (blob === null) return;
-      onSignatureChange(blob);
+      onChange(blob);
     }, `image/${blobFormat}`);
   };
 

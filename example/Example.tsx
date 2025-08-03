@@ -50,7 +50,7 @@ export default function Example() {
         blobFormat='png'
         className='canvas-border'
         height={300}
-        onSignatureChange={(blob) => {
+        onChange={(blob) => {
           setSignatureBlob(blob);
         }}
         ref={signatureRef}

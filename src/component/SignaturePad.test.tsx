@@ -52,7 +52,7 @@ it('renders a canvas element', () => {
 it('calls onSignatureChange after drawing', async () => {
   const onSignatureChange = vi.fn()
   render(<SignaturePad height={100} 
-    onSignatureChange={onSignatureChange}
+    onChange={onSignatureChange}
     width={100} />)
 
   const canvas = screen.getByRole('presentation') ;

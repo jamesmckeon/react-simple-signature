@@ -10,14 +10,15 @@ import useInit from "./useInit";
 import useDraw from './useDraw';
 
 export interface SignaturePadProps {
-  onSignatureChange?: (blob: Blob) => void;
+  onChange?: (blob: Blob) => void;
+  onStart?: () => void;
   height?: number ;
   width?: number ;
   className?: string;
   ref?: Ref<SignaturePadRef>; 
   blobFormat?: "png" | "jpeg";
   strokeColor?: `#${string}`;
-}
+} 
 
 export interface SignaturePadRef {
   clear: () => void;
@@ -25,7 +26,7 @@ export interface SignaturePadRef {
 
 export default function SignaturePad({
   ref,
-  onSignatureChange,
+  onChange: onSignatureChange,
   height,
   width,
   className, 
@@ -36,7 +37,7 @@ export default function SignaturePad({
   const {
     draw, canvasRef,  setHasDrawn, endDrawing, startDrawing
   } = useDraw({
-    onSignatureChange, blobFormat
+    onChange: onSignatureChange, blobFormat
   });
 
   useInit({

@@ -66,6 +66,8 @@ export default function useDraw({
     if (!drawing) return;
 
     const position = getEventPosition(e);
+
+    // if coordinates haven't been set, exit
     if (!position || !lastPoint) return;
 
     const {

@@ -3,7 +3,7 @@ import {
   renderHook , act
 } from '@testing-library/react';
 import {
-  vi, expect, it, beforeEach 
+  vi, expect, it, beforeEach , type MockInstance
 } from 'vitest';
 
 type CanvasContext = {
@@ -12,6 +12,7 @@ type CanvasContext = {
   quadraticCurveTo: (cpx: number, cpy: number, x: number, y: number) => void;
   stroke: () => void;
   closePath: () => void;
+  clearRect: (x: number, y: number, w: number, h: number) => void;
 };
 
 type CanvasMock = {
@@ -20,6 +21,8 @@ type CanvasMock = {
     left: number; top: number 
   };
   toBlob: (cb: (blob: Blob) => void, type?: string) => void;
+  width?: number;
+  height?: number;
 };
 
 function createCanvasMock(): CanvasMock & {
@@ -31,6 +34,7 @@ function createCanvasMock(): CanvasMock & {
     quadraticCurveTo: vi.fn(),
     stroke: vi.fn(),
     closePath: vi.fn(),
+    clearRect: vi.fn(),
   };
 
   return {
@@ -67,7 +71,7 @@ beforeEach(() => {
   canvasMock = createCanvasMock();
 });
 
-it('returns expected shape from useDraw', () => {
+it('returns expected object from useDraw', () => {
   const {
     result 
   } = renderHook(() => useDraw({
@@ -75,7 +79,8 @@ it('returns expected shape from useDraw', () => {
   expect.soft(result.current).toHaveProperty('canvasRef');
   expect.soft(typeof result.current.draw).toBe('function');
   expect.soft(typeof result.current.startDrawing).toBe('function');
-  expect.soft(typeof result.current.endDrawing).toBe('function');
+  expect.soft(typeof result.current.clear).toBe('function');
+
 });
 
 it('calls beginPath and moveTo on startDrawing', () => {
@@ -199,7 +204,36 @@ it('does not emit blob or closePath if drawing is false', () => {
   expect.soft(onChange).not.toHaveBeenCalled();
 });
 
-it('updates lastPoint after drawing', () => {
+it('clears canvas and resets state on clear()', () =>{
+  const {
+    result 
+  } = renderHook(() => useDraw({
+  }));
+
+  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
+
+  // these will be used later to confirm
+  // spy has been called as expected
+  const width = 99;
+  const height = 98;
+
+  result.current.canvasRef.current.width = width;
+  result.current.canvasRef.current.height = height;
+
+  (canvasMock.getContext as unknown as MockInstance)
+    .mockReturnValue(canvasMock._context);
+
+  act(() => {
+    result.current.clear();
+  });
+
+  expect(canvasMock._context.clearRect).
+    toHaveBeenCalledWith(0, 0, canvasMock.width, canvasMock.height);
+  
+})
+
+it('draw calls expected methods', () => {
+  // Arrange
   const {
     result 
   } = renderHook(() => useDraw({
@@ -214,6 +248,25 @@ it('updates lastPoint after drawing', () => {
     result.current.draw(createMouseEvent(20, 20));
   });
 
-  expect.soft(result.current).toHaveProperty('draw'); // just to keep the shape consistent
-  // Ideally, you'd expose `lastPoint` via a ref or debugging-only API to verify directly
+  // Assert
+  const ctx = canvasMock._context;
+
+  expect(ctx.quadraticCurveTo).toHaveBeenCalled();
+  expect(ctx.stroke).toHaveBeenCalled();
+  
+});
+
+it('does not draw if lastPoint is null', () => {
+  const {
+    result 
+  } = renderHook(() => useDraw({
+  }));
+  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
+
+  act(() => {
+    result.current.draw(createMouseEvent(10, 10)); // no startDrawing()
+  });
+
+  expect(canvasMock._context.quadraticCurveTo).not.toHaveBeenCalled();
+  expect(canvasMock._context.stroke).not.toHaveBeenCalled();
 });

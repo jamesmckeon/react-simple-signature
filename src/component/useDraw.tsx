@@ -13,8 +13,10 @@ interface useDrawProps {
   blobFormat?: "png" | "jpeg";
 }
 
-// Custom hook for managing drawing behavior on a canvas, 
-// including tracking state and emitting an image blob when drawing ends.
+/**
+ * Hook for handling smooth canvas-based drawing, touch/mouse support, and emitting a blob image.
+ * Supports consumer callbacks for draw start and completion.
+ */
 export default function useDraw({
   onChange, blobFormat, onStart
 }: useDrawProps) {
@@ -26,13 +28,15 @@ export default function useDraw({
   // Tracks whether any drawing has occurred (used to decide if a blob should be emitted)
   const [hasDrawn, setHasDrawn] = useState(false);
 
-  // Stores the last recorded point during drawing,
-  // used to smooth the line using quadratic curves
+  // Last recorded point used for smoothing with quadratic curves
   const [lastPoint, setLastPoint] = useState<{
     x: number; y: number 
   } | null>(null);
 
-  // Determines the (x, y) position on the canvas from a touch or mouse event
+  /**
+   * Returns canvas-relative coordinates for a mouse or touch event.
+   * Returns null if canvas isn't ready.
+   */
   const getEventPosition = (
     e: TouchEvent<HTMLCanvasElement> | MouseEvent<HTMLCanvasElement>
   ): {
@@ -59,7 +63,10 @@ export default function useDraw({
     };
   };
 
-  // Draws a smooth line to the current cursor/touch position using quadratic curves
+  /**
+   * Draws a smooth line from the last point to the current event position.
+   * No-ops if drawing hasn't started or the canvas is unavailable.
+   */
   const draw = (
     e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>
   ) => {
@@ -88,7 +95,10 @@ export default function useDraw({
     setHasDrawn(true);
   };
 
-  // Starts a new path for drawing when the user begins a stroke
+  /**
+   * Begins a new drawing path at the current event position.
+   * Invokes onStart callback if provided.
+   */
   const startDrawing = (
     e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>
   ) => {
@@ -113,7 +123,9 @@ export default function useDraw({
       onStart();
   };
 
-  // Emits the current canvas content as a Blob using the specified image format
+  /**
+   * Emits the current canvas contents as a Blob to the onChange callback.
+   */
   const emitBlob = () => {
     if (!canvasRef.current || !onChange) return;
 
@@ -123,7 +135,9 @@ export default function useDraw({
     }, `image/${blobFormat}`);
   };
 
-  // Ends the current drawing session and emits a blob if drawing occurred
+  /**
+   * Ends the current stroke and emits a blob if anything was drawn.
+   */
   const endDrawing = () => {
     if (!drawing) return; // prevent double calls
 
@@ -140,11 +154,28 @@ export default function useDraw({
     }
   };
 
+  /**
+   * Clears the canvas and resets internal state.
+   */
+  const clear = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // 🧽
+    setLastPoint(null);
+    setHasDrawn(false); // 🧠
+    setDrawing(false);
+  };
+
   return {
     draw,
     canvasRef,
     setHasDrawn,
     endDrawing,
     startDrawing,
+    clear
   };
 }

@@ -1,7 +1,7 @@
-import SignaturePad, {
+import SimpleSignature, {
   type SignaturePadRef 
 } 
-  from '../src/component/SignaturePad'
+  from '../src/component/Component'
 import {
   useRef, useState, useEffect 
 } from 'react'
@@ -46,7 +46,7 @@ export default function Example() {
           onChange={(e) => { setStroke(e.target.value as `#${string}`); }}
           type="color" 
           value={stroke} /></div>
-      <SignaturePad
+      <SimpleSignature
         blobFormat='png'
         className='canvas-border'
         height={300}

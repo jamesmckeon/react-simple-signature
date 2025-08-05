@@ -9,7 +9,7 @@ import type {
 import useInit from "./useInit";
 import useDraw from './useDraw';
 
-export interface SignaturePadProps {
+export interface SimpleSignatureProps {
   onChange?: (blob: Blob) => void;
   onStart?: () => void;
   height?: number ;
@@ -24,7 +24,11 @@ export interface SignaturePadRef {
   clear: () => void;
 }
 
-export default function SignaturePad({
+/**
+ * SimpleSignature is a functional component for that captures user-drawn lines.
+ * It supports mouse and touch input, emits a blob when drawing ends, and can be cleared via ref.
+ */
+export default function SimpleSignature({
   ref,
   onChange: onSignatureChange,
   height,
@@ -32,7 +36,7 @@ export default function SignaturePad({
   className, 
   blobFormat = "png", 
   strokeColor = "#000"
-}: SignaturePadProps) {
+}: SimpleSignatureProps) {
 
   const {
     draw, canvasRef,  setHasDrawn, endDrawing, startDrawing
@@ -44,6 +48,7 @@ export default function SignaturePad({
     height, width, strokeColor,canvasRef
   });
 
+  // Expose a clear() method to parent components via ref
   useImperativeHandle(ref, () => ({
     clear: () => {
       const canvas = canvasRef.current;
@@ -57,10 +62,13 @@ export default function SignaturePad({
 
   return (
     <canvas
-      aria-label="Signature pad. Draw your signature using mouse or touch."
+      aria-label={
+        "Signature input area. Use your mouse or touch " +
+        "to draw your signature."
+      }
       className={className}
       onMouseDown={startDrawing}
-      onMouseLeave={endDrawing} // end drawing when user leaves canvas
+      onMouseLeave={endDrawing} // finalize drawing if pointer leaves canvas
       onMouseMove={draw}
       onMouseUp={endDrawing}
       onTouchCancel={endDrawing}
@@ -70,7 +78,7 @@ export default function SignaturePad({
       ref={canvasRef}
       role="img"
       style={{
-        touchAction: "none" 
+        touchAction: "none" // prevent scrolling during touch drawing
       }}
       tabIndex={0}
     />

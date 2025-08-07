@@ -45,7 +45,7 @@ export default function SimpleSignature({
   });
 
   useInit({
-    height, width, strokeColor,canvasRef
+    height, width, strokeColor,canvasRef, className
   });
 
   // Expose a clear() method to parent components via ref
@@ -66,7 +66,6 @@ export default function SimpleSignature({
         "Signature input area. Use your mouse or touch " +
         "to draw your signature."
       }
-      className={className}
       onMouseDown={startDrawing}
       onMouseLeave={endDrawing} // finalize drawing if pointer leaves canvas
       onMouseMove={draw}
@@ -76,11 +75,9 @@ export default function SimpleSignature({
       onTouchMove={draw}
       onTouchStart={startDrawing} 
       ref={canvasRef}
-      role="img"
       style={{
         touchAction: "none" // prevent scrolling during touch drawing
       }}
-      tabIndex={0}
     />
  
   );

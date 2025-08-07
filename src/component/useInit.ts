@@ -3,6 +3,7 @@ import {
 } from "react";
   
 interface hookProps{
+  className?:string
   height?: number; 
   width?: number;  
   strokeColor?: `#${string}`;
@@ -14,7 +15,7 @@ interface hookProps{
  * scales the context for devicePixelRatio, and applies default stroke styles.
  */
 export default function useInit({
-  height, width, strokeColor, canvasRef
+  className,height, width, strokeColor, canvasRef
 }: hookProps) {
 
   useEffect(() => {
@@ -23,7 +24,10 @@ export default function useInit({
       return;
 
     const canvas = canvasRef.current;
-   
+    canvas.role = 'img';
+    canvas.tabIndex=0;
+    canvas.className = className??'';
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -50,6 +54,6 @@ export default function useInit({
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
     ctx.strokeStyle = strokeColor?? '#000000' ;
-  }, [width, height, strokeColor, canvasRef]);
+  }, [width, height, strokeColor, canvasRef, className]);
 
 }

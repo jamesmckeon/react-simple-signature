@@ -1,56 +1,12 @@
+import  'vitest-canvas-mock';
 import useDraw from './useDraw';
 import {
   renderHook , act
 } from '@testing-library/react';
 import {
-  vi, expect, it, beforeEach , type MockInstance
+  vi, expect, it, beforeEach , describe
 } from 'vitest';
 
-type CanvasContext = {
-  beginPath: () => void;
-  moveTo: (x: number, y: number) => void;
-  quadraticCurveTo: (cpx: number, cpy: number, x: number, y: number) => void;
-  stroke: () => void;
-  closePath: () => void;
-  clearRect: (x: number, y: number, w: number, h: number) => void;
-};
-
-type CanvasMock = {
-  getContext: (type?: string) => CanvasContext;
-  getBoundingClientRect: () => {
-    left: number; top: number 
-  };
-  toBlob: (cb: (blob: Blob) => void, type?: string) => void;
-  width?: number;
-  height?: number;
-};
-
-function createCanvasMock(): CanvasMock & {
-  _context: CanvasContext 
-} {
-  const context: CanvasContext = {
-    beginPath: vi.fn(),
-    moveTo: vi.fn(),
-    quadraticCurveTo: vi.fn(),
-    stroke: vi.fn(),
-    closePath: vi.fn(),
-    clearRect: vi.fn(),
-  };
-
-  return {
-    getContext: vi.fn(() => context),
-    getBoundingClientRect: vi.fn(() => ({
-      left: 10,
-      top: 20,
-    })),
-    toBlob: vi.fn((cb: (blob: Blob) => void, type?: string) => {
-      cb(new Blob(['test'], {
-        type: type as string 
-      }));
-    }),
-    _context: context,
-  };
-}
 
 function createMouseEvent(x: number, y: number): 
 React.MouseEvent<HTMLCanvasElement> {
@@ -63,13 +19,10 @@ React.MouseEvent<HTMLCanvasElement> {
   } as unknown as React.MouseEvent<HTMLCanvasElement>;
 }
 
-let canvasMock: CanvasMock & {
-  _context: CanvasContext 
-};
-
 beforeEach(() => {
-  canvasMock = createCanvasMock();
+  vi.restoreAllMocks(); // resets spies/mocks
 });
+
 
 it('returns expected object from useDraw', () => {
   const {
@@ -83,20 +36,45 @@ it('returns expected object from useDraw', () => {
 
 });
 
-it('calls beginPath and moveTo on startDrawing', () => {
-  const {
-    result 
-  } = renderHook(() => useDraw({
-  }));
-  // as unknown to avoid having to define every canvas property
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
+describe('startDrawing', () =>{
+  it('calls beginPath and moveTo on startDrawing', () => {
 
-  result.current.startDrawing(createMouseEvent(50, 60));
+    const {
+      canvas, context
+    } = setupCanvas();
 
-  const context = (canvasMock)._context;
-  expect.soft(context.beginPath).toHaveBeenCalled();
-  expect.soft(context.moveTo).toHaveBeenCalledWith(40, 40); // because left=10, top=20
-});
+    const {
+      result 
+    } = renderHook(() => useDraw({
+    }));
+
+    const beginPathMock = vi.spyOn(context, 'beginPath');
+    const moveToMock = vi.spyOn(context, 'moveTo');
+    result.current.canvasRef.current = canvas;
+
+    result.current.startDrawing(createMouseEvent(50, 60));
+
+    expect.soft(beginPathMock).toHaveBeenCalled();
+    expect.soft(moveToMock).toHaveBeenCalledWith(50, 60); // because left=10, top=20
+  });
+
+  it('calls onStart when startDrawing is triggered', () => {
+    const onStart = vi.fn();
+    const {
+      result 
+    } = renderHook(() => useDraw({
+      onStart 
+    }));
+    result.current.canvasRef.current = 
+    canvasMock as unknown as HTMLCanvasElement;
+
+    act(() => {
+      result.current.startDrawing(createMouseEvent(10, 10));
+    });
+
+    expect(onStart).toHaveBeenCalledTimes(1);
+  });
+})
 
 it('calls closePath and toBlob on endDrawing if hasDrawn', () => {
   const onChange = vi.fn();
@@ -123,23 +101,6 @@ it('calls closePath and toBlob on endDrawing if hasDrawn', () => {
   expect.soft(context.closePath).toHaveBeenCalled();
   expect.soft(canvasMock.toBlob).toHaveBeenCalled();
   expect.soft(onChange).toHaveBeenCalledWith(expect.any(Blob));
-});
-
-
-it('calls onStart when startDrawing is triggered', () => {
-  const onStart = vi.fn();
-  const {
-    result 
-  } = renderHook(() => useDraw({
-    onStart 
-  }));
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
-
-  act(() => {
-    result.current.startDrawing(createMouseEvent(10, 10));
-  });
-
-  expect(onStart).toHaveBeenCalledTimes(1);
 });
 
 it('calls onChange with a Blob when drawing ends', () => {
@@ -270,3 +231,15 @@ it('does not draw if lastPoint is null', () => {
   expect(canvasMock._context.quadraticCurveTo).not.toHaveBeenCalled();
   expect(canvasMock._context.stroke).not.toHaveBeenCalled();
 });
+
+function setupCanvas() {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  if (context == null)
+    throw new Error("2dContext is null");
+
+  return {
+    canvas, context
+  };
+}

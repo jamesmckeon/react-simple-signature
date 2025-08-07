@@ -5,7 +5,7 @@ import {
 interface hookProps{
   height?: number; 
   width?: number;  
-  strokeColor: `#${string}`;
+  strokeColor?: `#${string}`;
   canvasRef: RefObject<HTMLCanvasElement|null> ; // Allow null for initial render
 }
   
@@ -49,7 +49,7 @@ export default function useInit({
     // Configure default drawing style
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
-    ctx.strokeStyle = strokeColor ;
+    ctx.strokeStyle = strokeColor?? '#000000' ;
   }, [width, height, strokeColor, canvasRef]);
 
 }

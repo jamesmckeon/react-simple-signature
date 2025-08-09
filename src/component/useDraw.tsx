@@ -114,7 +114,7 @@ export default function useDraw({
     ctx.beginPath();
     ctx.moveTo(offsetX, offsetY);
     setDrawing(true);
-    setHasDrawn(false);
+    setHasDrawn(true);
     setLastPoint({
       x: offsetX, y: offsetY 
     });
@@ -173,7 +173,6 @@ export default function useDraw({
   return {
     draw,
     canvasRef,
-    setHasDrawn,
     endDrawing,
     startDrawing,
     clear

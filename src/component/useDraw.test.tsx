@@ -4,9 +4,8 @@ import {
   renderHook , act
 } from '@testing-library/react';
 import {
-  vi, expect, it, beforeEach , describe
+  vi, expect, it, beforeEach 
 } from 'vitest';
-
 
 function createMouseEvent(x: number, y: number): 
 React.MouseEvent<HTMLCanvasElement> {
@@ -16,7 +15,7 @@ React.MouseEvent<HTMLCanvasElement> {
     preventDefault: () => {},
     target: {
     } as EventTarget,
-  } as unknown as React.MouseEvent<HTMLCanvasElement>;
+  }  as React.MouseEvent<HTMLCanvasElement>;
 }
 
 beforeEach(() => {
@@ -36,81 +35,66 @@ it('returns expected object from useDraw', () => {
 
 });
 
-describe('startDrawing', () =>{
-  it('calls beginPath and moveTo on startDrawing', () => {
 
-    const {
-      canvas, context
-    } = setupCanvas();
+it('calls beginPath and moveTo on startDrawing', () => {
 
-    const {
-      result 
-    } = renderHook(() => useDraw({
-    }));
+  const {
+    canvas, context
+  } = setupCanvas();
 
-    const beginPathMock = vi.spyOn(context, 'beginPath');
-    const moveToMock = vi.spyOn(context, 'moveTo');
-    result.current.canvasRef.current = canvas;
-
-    result.current.startDrawing(createMouseEvent(50, 60));
-
-    expect.soft(beginPathMock).toHaveBeenCalled();
-    expect.soft(moveToMock).toHaveBeenCalledWith(50, 60); // because left=10, top=20
-  });
-
-  it('calls onStart when startDrawing is triggered', () => {
-    const onStart = vi.fn();
-    const {
-      result 
-    } = renderHook(() => useDraw({
-      onStart 
-    }));
-    result.current.canvasRef.current = 
-    canvasMock as unknown as HTMLCanvasElement;
-
-    act(() => {
-      result.current.startDrawing(createMouseEvent(10, 10));
-    });
-
-    expect(onStart).toHaveBeenCalledTimes(1);
-  });
-})
-
-it('calls closePath and toBlob on endDrawing if hasDrawn', () => {
-  const onChange = vi.fn();
   const {
     result 
   } = renderHook(() => useDraw({
-    onChange, blobFormat: 'png' 
   }));
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
+
+  const beginPathMock = vi.spyOn(context, 'beginPath');
+  const moveToMock = vi.spyOn(context, 'moveTo');
+  result.current.canvasRef.current = canvas;
+
+  result.current.startDrawing(createMouseEvent(50, 60));
+
+  expect.soft(beginPathMock).toHaveBeenCalled();
+  expect.soft(moveToMock).toHaveBeenCalledWith(50, 60); // because left=10, top=20
+});
+
+it('calls onStart when startDrawing is triggered', () => {
+
+  const onStart = vi.fn();
+
+  const {
+    canvas
+  } = setupCanvas();
+
+  const {
+    result 
+  } = renderHook(() => useDraw({
+    onStart 
+  }));
+
+  result.current.canvasRef.current = canvas;
 
   act(() => {
     result.current.startDrawing(createMouseEvent(10, 10));
   });
 
-  act(() => {
-    result.current.setHasDrawn(true); 
-  });
-
-  act(() => {
-    result.current.endDrawing();
-  });
-
-  const context = (canvasMock)._context;
-  expect.soft(context.closePath).toHaveBeenCalled();
-  expect.soft(canvasMock.toBlob).toHaveBeenCalled();
-  expect.soft(onChange).toHaveBeenCalledWith(expect.any(Blob));
+  expect(onStart).toHaveBeenCalledTimes(1);
 });
 
-it('calls onChange with a Blob when drawing ends', () => {
+it('calls onChange with a Blob when drawing ends', async() => {
+
+  const {
+    canvas
+  } = setupCanvas();
+
   const onChange = vi.fn();
+
   const {
     result 
   } = renderHook(() => useDraw({
     onChange, blobFormat: 'png' 
   }));
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
+
+  result.current.canvasRef.current = canvas;
 
   // have to wrap each method in act() bc test needs state to update
   // between them
@@ -119,119 +103,105 @@ it('calls onChange with a Blob when drawing ends', () => {
   });
 
   act(() => {
-    result.current.setHasDrawn(true);
-  });
-
-  act(() => {
     result.current.endDrawing();
   });
 
-  expect.soft(onChange).toHaveBeenCalledTimes(1);
-  expect.soft(onChange.mock.calls[0][0]).toBeInstanceOf(Blob);
-});
-
-it('does not draw if drawing is false', () => {
-  const {
-    result 
-  } = renderHook(() => useDraw({
-  }));
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
-
-  act(() => {
-    result.current.draw(createMouseEvent(20, 30));
+  // canvas.toBlob() is callback/async, so we have to
+  // waitFor() here
+  await vi.waitFor(() => { 
+    // expect.soft inside waitFor() won't work
+    expect(onChange).toHaveBeenCalledTimes(1); 
+    expect(onChange.mock.calls[0][0]).toBeInstanceOf(Blob);
   });
 
-  const context = canvasMock._context;
-  expect.soft(context.quadraticCurveTo).not.toHaveBeenCalled();
-  expect.soft(context.stroke).not.toHaveBeenCalled();
 });
 
-it('does not emit blob or closePath if drawing is false', () => {
+it('doesnt call onChange if nothing has been drawn', () => {
+  const {
+    canvas
+  } = setupCanvas();
+  
   const onChange = vi.fn();
   const {
     result 
   } = renderHook(() => useDraw({
     onChange, blobFormat: 'png' 
   }));
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
+  
+  result.current.canvasRef.current = canvas;
 
   act(() => {
     result.current.endDrawing();
   });
 
-  const context = canvasMock._context;
-  expect.soft(context.closePath).not.toHaveBeenCalled();
-  expect.soft(canvasMock.toBlob).not.toHaveBeenCalled();
-  expect.soft(onChange).not.toHaveBeenCalled();
+  expect(onChange).not.toHaveBeenCalled();
 });
 
-it('clears canvas and resets state on clear()', () =>{
+it('clears canvas on clear()', () =>{
+
+  const {
+    canvas, context
+  } = setupCanvas();
+
   const {
     result 
   } = renderHook(() => useDraw({
   }));
 
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
+  result.current.canvasRef.current =canvas;
 
-  // these will be used later to confirm
-  // spy has been called as expected
-  const width = 99;
-  const height = 98;
+  result.current.startDrawing(createMouseEvent(1,2));
+  result.current.draw(createMouseEvent(10, 11));
+  result.current.clear();
 
-  result.current.canvasRef.current.width = width;
-  result.current.canvasRef.current.height = height;
-
-  (canvasMock.getContext as unknown as MockInstance)
-    .mockReturnValue(canvasMock._context);
-
-  act(() => {
-    result.current.clear();
-  });
-
-  expect(canvasMock._context.clearRect).
-    toHaveBeenCalledWith(0, 0, canvasMock.width, canvasMock.height);
+  // useInit() will modify the canvas size if specified by user
+  // since useInit() isn't used here, the canvas will be using its
+  // intrinsic width and height: 300x150
+  expect(context.clearRect).toHaveBeenCalledWith(0, 0, 300, 150);
   
 })
 
-it('draw calls expected methods', () => {
-  // Arrange
+it('aborts draw() if startDrawing() hasnt been called first', () =>{
+
   const {
-    result 
+    canvas, context
+  } = setupCanvas();
+
+  const{
+    result
   } = renderHook(() => useDraw({
-  }));
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
+  }))
 
-  act(() => {
-    result.current.startDrawing(createMouseEvent(10, 10));
-  });
+  result.current.canvasRef.current = canvas;
 
-  act(() => {
-    result.current.draw(createMouseEvent(20, 20));
-  });
+  result.current.draw(createMouseEvent(1,1));
 
-  // Assert
-  const ctx = canvasMock._context;
+  expect(context.quadraticCurveTo).toHaveBeenCalledTimes(0);
 
-  expect(ctx.quadraticCurveTo).toHaveBeenCalled();
-  expect(ctx.stroke).toHaveBeenCalled();
+})
+
+it('calls expected on draw()',async () =>{
+
+  const {
+    canvas, context
+  } = setupCanvas();
+
+  const{
+    result
+  } = renderHook(() => useDraw({
+  }))
+
+  result.current.canvasRef.current = canvas;
+
+  await vi.waitFor(() =>{
+    result.current.startDrawing(createMouseEvent(1,1));
+    result.current.draw(createMouseEvent(1,1));
+
+    expect(context.quadraticCurveTo).toHaveBeenCalledTimes(1);
+  })
   
-});
 
-it('does not draw if lastPoint is null', () => {
-  const {
-    result 
-  } = renderHook(() => useDraw({
-  }));
-  result.current.canvasRef.current = canvasMock as unknown as HTMLCanvasElement;
-
-  act(() => {
-    result.current.draw(createMouseEvent(10, 10)); // no startDrawing()
-  });
-
-  expect(canvasMock._context.quadraticCurveTo).not.toHaveBeenCalled();
-  expect(canvasMock._context.stroke).not.toHaveBeenCalled();
-});
-
+})
 function setupCanvas() {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
@@ -239,6 +209,9 @@ function setupCanvas() {
   if (context == null)
     throw new Error("2dContext is null");
 
+  // Always return this same instance when getContext is called
+  vi.spyOn(canvas, 'getContext').mockReturnValue(context);
+  
   return {
     canvas, context
   };

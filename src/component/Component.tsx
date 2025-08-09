@@ -10,7 +10,16 @@ import useInit from "./useInit";
 import useDraw from './useDraw';
 
 export interface SimpleSignatureProps {
+  /**
+   * Called when the user modifies the drawing; returns a blob of the new drawing
+   * @param blob 
+   * @returns 
+   */
   onChange?: (blob: Blob) => void;
+  /**
+   * Called when the user starts drawing
+   * @returns 
+   */
   onStart?: () => void;
   height?: number ;
   width?: number ;
@@ -39,7 +48,7 @@ export default function SimpleSignature({
 }: SimpleSignatureProps) {
 
   const {
-    draw, canvasRef,  setHasDrawn, endDrawing, startDrawing
+    draw, canvasRef,  clear, endDrawing, startDrawing
   } = useDraw({
     onChange: onSignatureChange, blobFormat
   });
@@ -50,14 +59,7 @@ export default function SimpleSignature({
 
   // Expose a clear() method to parent components via ref
   useImperativeHandle(ref, () => ({
-    clear: () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      setHasDrawn(false);
-    }
+    clear
   }));
 
   return (

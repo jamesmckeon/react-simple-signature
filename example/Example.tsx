@@ -1,7 +1,7 @@
 import SimpleSignature, {
   type SignaturePadRef 
 } 
-  from '../src/component/Component'
+  from '../src/component/SimpleSignature'
 import {
   useRef, useState, useEffect 
 } from 'react'

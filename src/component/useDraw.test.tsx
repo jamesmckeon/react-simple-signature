@@ -111,7 +111,10 @@ it('calls onChange with a Blob when drawing ends', async() => {
   await vi.waitFor(() => { 
     // expect.soft inside waitFor() won't work
     expect(onChange).toHaveBeenCalledTimes(1); 
-    expect(onChange.mock.calls[0][0]).toBeInstanceOf(Blob);
+
+    const blob = onChange.mock.calls[0][0] as Blob;
+    expect(blob).toBeInstanceOf(Blob);
+    expect(blob.type).toBe('image/png');
   });
 
 });

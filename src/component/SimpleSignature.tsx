@@ -44,13 +44,14 @@ export default function SimpleSignature({
   width,
   className, 
   blobFormat = "png", 
-  strokeColor = "#000"
+  strokeColor = "#000",
+  onStart
 }: SimpleSignatureProps) {
 
   const {
     draw, canvasRef,  clear, endDrawing, startDrawing
   } = useDraw({
-    onChange: onSignatureChange, blobFormat
+    onChange: onSignatureChange, blobFormat, onStart
   });
 
   useInit({

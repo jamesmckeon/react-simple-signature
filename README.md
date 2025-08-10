@@ -1,6 +1,6 @@
 # react-simple-signature
 
-A lightweight React component for capturing lines drawn via touch or mouse. Designed with smooth stroke rendering, high-DPI support, image export, and an exposed `ref` that allows consumers clear the component.
+A lightweight React component that captures lines drawn via touch or mouse. Designed with smooth stroke rendering, high-DPI support, image export, and an exposed `ref` that allows consumers clear the component.
 
 ---
 
@@ -57,15 +57,16 @@ function MyForm() {
 
 ## Props
 
-| Prop              | Type                             | Default   | Description                                               |
-|-------------------|----------------------------------|-----------|-----------------------------------------------------------|
-| `width`           | `number \| null`                 | `400`     | Canvas width in pixels                                    |
-| `height`          | `number \| null`                 | `400`     | Canvas height in pixels                                   |
-| `onSignatureChange` | `(blob: Blob) => void`         | `undefined` | Callback when user draws on canvas                        |
-| `className`       | `string`                         | `""`      | Optional class name for styling the canvas                |
-| `blobFormat`      | `"png"` \| `"jpeg"`              | `"png"`   | Format of exported signature image                        |
-| `strokeColor`     | `` `#${string}` ``               | `"#000"`  | Hex color for the signature stroke                        |
-| `ref`             | `React.Ref<SignaturePadRef>`     | `—`       | Exposes `clear()` for programmatic canvas clearing        |
+| Prop         | Type                             | Default   | Description                                                   |
+|--------------|----------------------------------|-----------|---------------------------------------------------------------|
+| `onChange`   | `(blob: Blob) => void`           | —         | Callback fired when the user modifies the drawing; receives a blob of the updated image |
+| `onStart`    | `() => void`                     | —         | Callback fired when the user starts drawing                   |
+| `height`     | `number`                         | —         | Canvas height in pixels                                       |
+| `width`      | `number`                         | —         | Canvas width in pixels                                        |
+| `className`  | `string`                         | `""`      | Optional class name for styling the canvas                    |
+| `ref`        | `Ref<SignatureRef>`              | —         | Ref exposing the `clear()` method for programmatic clearing   |
+| `blobFormat` | `"png"` \| `"jpeg"`              | `"png"`   | Format of the exported signature image                        |
+| `strokeColor`| `` `#${string}` ``               | `"#000"`  | Hex color for the signature stroke                            |
 
 ---
 
@@ -83,15 +84,15 @@ Use `ref.current?.clear()` to clear the canvas.
 
 ---
 
-## 🛠️ Scripts
+## Scripts
 
-| Script        | Description                     |
-|---------------|---------------------------------|
-| `npm run dev` | Start dev server with Vite      |
-| `npm run build` | Type-check and build project |
-| `npm run preview` | Preview the build locally   |
-| `npm run lint` | Run ESLint                    |
-| `npm run lint-fix` | Auto-fix ESLint issues     |
+| Script        | Description                               |
+|---------------|-------------------------------------------|
+| `build`       | Type-check and build the project          |
+| `lint`        | Run ESLint                                |
+| `lint-fix`    | Auto-fix ESLint issues                    |
+| `test`        | Run all tests with Vitest                 |
+| `dev:example` | Start the example app in development mode |
 
 ---
 

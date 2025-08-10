@@ -1,16 +1,16 @@
-# 🖊️ react-simple-signature
+# react-simple-signature
 
 A lightweight, high-DPI-aware React component for capturing signatures using an HTML `<canvas>` element. Designed with smooth stroke rendering, image export, and an exposed `ref` to allow consumers to programmatically clear the canvas.
 
 ---
 
-## 🧠 Background
+## Background
 
 I created `react-simple-signature` because I needed a clean, modern signature pad for a React app that worked seamlessly with TypeScript, supported high-DPI displays, and allowed programmatic control (like clearing the canvas). Most existing packages were either outdated, lacked TypeScript support, or didn't render smoothly across devices. This component aims to be simple, performant, and easy to integrate into any React project.
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install react-simple-signature
@@ -18,7 +18,7 @@ npm install react-simple-signature
 
 ---
 
-## 🚀 Usage
+## Usage
 
 ```tsx
 import React, { useRef } from 'react'
@@ -55,7 +55,7 @@ function MyForm() {
 
 ---
 
-## 🔧 Props
+## Props
 
 | Prop              | Type                             | Default   | Description                                               |
 |-------------------|----------------------------------|-----------|-----------------------------------------------------------|
@@ -69,7 +69,7 @@ function MyForm() {
 
 ---
 
-## 🧩 Ref API
+## Ref API
 
 The component supports a `ref` so consumers can interact with it programmatically:
 
@@ -95,7 +95,7 @@ Use `ref.current?.clear()` to clear the canvas.
 
 ---
 
-## 🧪 Testing
+## Testing
 
 This project uses [Vitest](https://vitest.dev/) for unit and browser tests.  
 Run tests with:
@@ -106,7 +106,7 @@ npx vitest
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 - React 19
 - TypeScript
@@ -116,13 +116,13 @@ npx vitest
 
 ---
 
-## 📄 License
+## License
 
 MIT
 
 ---
 
-## 👤 Author
+## Author
 
 Maintained by [jamesmckeon](https://github.com/jamesmckeon).
 

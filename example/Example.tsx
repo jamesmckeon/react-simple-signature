@@ -1,5 +1,5 @@
 import SimpleSignature, {
-  type SignaturePadRef 
+  type SignatureRef 
 } 
   from '../src/component/SimpleSignature'
 import {
@@ -9,7 +9,7 @@ import {
 import './example.css'
 
 export default function Example() {
-  const signatureRef = useRef<SignaturePadRef>(null);
+  const signatureRef = useRef<SignatureRef>(null);
   const [signatureBlob, setSignatureBlob] = useState<Blob | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [stroke, setStroke] = useState<`#${string}`>('#000000');

@@ -24,12 +24,12 @@ export interface SimpleSignatureProps {
   height?: number ;
   width?: number ;
   className?: string;
-  ref?: Ref<SignaturePadRef>; 
+  ref?: Ref<SignatureRef>; 
   blobFormat?: "png" | "jpeg";
   strokeColor?: `#${string}`;
 } 
 
-export interface SignaturePadRef {
+export interface SignatureRef {
   clear: () => void;
 }
 

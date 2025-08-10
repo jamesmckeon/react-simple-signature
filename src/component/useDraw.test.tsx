@@ -153,6 +153,8 @@ it('clears canvas on clear()', () =>{
 
   result.current.canvasRef.current =canvas;
 
+  const clearRectSpy = vi.spyOn(context, 'clearRect');
+
   result.current.startDrawing(createMouseEvent(1,2));
   result.current.draw(createMouseEvent(10, 11));
   result.current.clear();
@@ -160,7 +162,7 @@ it('clears canvas on clear()', () =>{
   // useInit() will modify the canvas size if specified by user
   // since useInit() isn't used here, the canvas will be using its
   // intrinsic width and height: 300x150
-  expect(context.clearRect).toHaveBeenCalledWith(0, 0, 300, 150);
+  expect(clearRectSpy).toHaveBeenCalledWith(0, 0, 300, 150);
   
 })
 
@@ -177,9 +179,11 @@ it('aborts draw() if startDrawing() hasnt been called first', () =>{
 
   result.current.canvasRef.current = canvas;
 
+  const spy = vi.spyOn(context, 'quadraticCurveTo');
+
   result.current.draw(createMouseEvent(1,1));
 
-  expect(context.quadraticCurveTo).toHaveBeenCalledTimes(0);
+  expect(spy).toHaveBeenCalledTimes(0);
 
 })
 
@@ -196,11 +200,13 @@ it('calls expected on draw()',async () =>{
 
   result.current.canvasRef.current = canvas;
 
+  const spy = vi.spyOn(context, 'quadraticCurveTo');
+
   await vi.waitFor(() =>{
     result.current.startDrawing(createMouseEvent(1,1));
     result.current.draw(createMouseEvent(1,1));
 
-    expect(context.quadraticCurveTo).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledTimes(1);
   })
   
 

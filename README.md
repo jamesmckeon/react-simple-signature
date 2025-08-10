@@ -22,10 +22,10 @@ npm install react-simple-signature
 
 ```tsx
 import React, { useRef } from 'react'
-import SignaturePad, { SignaturePadRef } from 'react-simple-signature'
+import SimpleSignature, { SignatureRef } from 'react-simple-signature'
 
 function MyForm() {
-  const padRef = useRef<SignaturePadRef>(null)
+  const signatureRef = useRef<SignatureRef>(null)
 
   const handleSignature = (blob: Blob) => {
     const url = URL.createObjectURL(blob)
@@ -38,8 +38,8 @@ function MyForm() {
 
   return (
     <>
-      <SignaturePad
-        ref={padRef}
+      <SimpleSignature
+        ref={signatureRef}
         onSignatureChange={handleSignature}
         width={500}
         height={300}

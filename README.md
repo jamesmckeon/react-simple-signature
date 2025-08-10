@@ -1,6 +1,6 @@
 # react-simple-signature
 
-A lightweight, high-DPI-aware React component for capturing signatures using an HTML `<canvas>` element. Designed with smooth stroke rendering, image export, and an exposed `ref` to allow consumers to programmatically clear the canvas.
+A lightweight, high-DPI-aware React component for capturing lines drawn via touch or mouse. Designed with smooth stroke rendering, image export, and an exposed `ref` that allows consumers clear the component.
 
 ---
 

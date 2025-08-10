@@ -1,12 +1,12 @@
 # react-simple-signature
 
-A lightweight, high-DPI-aware React component for capturing lines drawn via touch or mouse. Designed with smooth stroke rendering, image export, and an exposed `ref` that allows consumers clear the component.
+A lightweight React component for capturing lines drawn via touch or mouse. Designed with smooth stroke rendering, high-DPI support, image export, and an exposed `ref` that allows consumers clear the component.
 
 ---
 
 ## Background
 
-I created `react-simple-signature` because I needed a clean, modern signature pad for a React app that worked seamlessly with TypeScript, supported high-DPI displays, and allowed programmatic control (like clearing the canvas). Most existing packages were either outdated, lacked TypeScript support, or didn't render smoothly across devices. This component aims to be simple, performant, and easy to integrate into any React project.
+I built `react-simple-signature` to provide a minimal, easy-to-use solution for capturing signatures in React applications without dealing with HTML canvas complexity. It works seamlessly with both touch and mouse input, supports high-DPI displays for crisp rendering, and exposes a simple `ref` API for programmatic clearing. The component is unopinionated about styling, letting you integrate it into any design system, and it outputs image data in common formats without requiring deep canvas knowledge.
 
 ---
 

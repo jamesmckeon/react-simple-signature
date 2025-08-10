@@ -1,15 +1,64 @@
 {
   "name": "react-simple-signature",
-  "private": false,
   "version": "1.0.0",
+  "private": false,
+  "description": "A simple-as-it-gets React signature pad/cavas component.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jamesmckeon/react-simple-signature.git"
+  },
+  "keywords": [
+    "react",
+    "react-component",
+    "react-hook",
+    "signature",
+    "signature-pad",
+    "signature pad",
+    "e-signature",
+    "esignature",
+    "digital-signature",
+    "online-signature",
+    "signature-capture",
+    "canvas",
+    "canvas-drawing",
+    "drawing",
+    "draw",
+    "drawing-pad",
+    "drawing canvas",
+    "stylus",
+    "touch",
+    "touchscreen",
+    "mouse",
+    "pointer",
+    "write",
+    "writing",
+    "scribble",
+    "sign",
+    "signing",
+    "form",
+    "form-input",
+    "input",
+    "field",
+    "ui",
+    "component",
+    "widget"
+  ],
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
-    "src",
     "dist/index.js",
     "dist/index.d.ts"
   ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "prepublishOnly": "npm run lint && npm test -- --run && npm run build",
   "scripts": {
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -17,11 +66,9 @@
     "test": "vitest",
     "dev:example": "vite --config vite.config.example.ts"
   },
-  "dependencies": {
-    "@types/node": "^24.0.10",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "vite-plugin-dts": "^4.5.4"
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
@@ -29,6 +76,7 @@
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
     "@types/eslint-plugin-jsx-a11y": "^6.10.0",
+    "@types/node": "^24.2.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@types/web": "^0.0.257",
@@ -49,9 +97,12 @@
     "jest-canvas-mock": "^2.5.2",
     "jiti": "^2.5.1",
     "jsdom": "^26.1.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.36.0",
     "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4",
     "vitest-canvas-mock": "^0.3.3"
   }

@@ -1,6 +1,6 @@
 # react-simple-signature
 
-A lightweight React component that captures lines drawn via touch or mouse. Designed with smooth stroke rendering, high-DPI support, image export, and an exposed `ref` that allows consumers clear the component.
+A lightweight React component for capturing, drawing, and exporting digital signatures on an HTML canvas. Supports touch, mouse, and stylus input for e-signature, signature pad, and handwriting capture in forms and apps.
 
 ---
 

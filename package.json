@@ -1,6 +1,6 @@
 {
   "name": "react-simple-signature",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "React signature pad component for touch/mouse with high-DPI rendering and export.",
   "license": "MIT",

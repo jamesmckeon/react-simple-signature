@@ -9,36 +9,33 @@ import dts from "vite-plugin-dts";
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
+  plugins: [
+    react(),
+    dts({
+      // Generate .d.ts into dist/ and add a "types" entry for the package root
+      insertTypesEntry: true,
+      outDir: "dist",
+      include: ["src"],
+      exclude: ["**/*.test.*", "**/__tests__/**"]
+    })
+  ],
   build: {
-    // Specifies that the output of the build will be a library.
     lib: {
-      // Defines the entry point for the library build. It resolves 
-      // to src/index.ts,indicating that the library starts from this file.
       entry: path.resolve(__dirname, "src/index.ts"),
-      name: "react-jp-ui",
-      // A function that generates the output file
-      // name for different formats during the build
-      fileName: format => `index.${format}.js`
+      name: "ReactSimpleSignature",
+      formats: ["es", "cjs"],
+      fileName: (format) => (format === "es" ? "index.js" : "index.cjs")
     },
     rollupOptions: {
-      external: ["react", "react-dom"],
-      output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM"
-        }
-      }
+      // mark peer deps as external so they’re not bundled
+      external: ["react", "react-dom"]
     },
-    // Generates sourcemaps for the built files,
-    // aiding in debugging.
     sourcemap: true,
-    // Clears the output directory before building.
-    emptyOutDir: true
+    target: "es2019",
+    // Keep JSX as runtime calls; fine for libs
+    // (Vite/ESBuild handles this via the React plugin)
+    minify: false
   },
-  // react() enables React support.
-  // dts() generates TypeScript declaration files (*.d.ts)
-  // during the build.
-  plugins: [react(), dts()],
   test: {
     projects: [{
       extends: true,

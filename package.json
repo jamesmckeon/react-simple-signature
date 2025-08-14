@@ -2,8 +2,27 @@
   "name": "react-simple-signature",
   "version": "1.0.0",
   "private": false,
-  "description": "A simple-as-it-gets React signature pad/cavas component.",
+  "description": "React signature pad component for touch/mouse with high-DPI rendering and export.",
   "license": "MIT",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "bugs": {
+    "url": "https://github.com/jamesmckeon/react-simple-signature/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/jamesmckeon/react-simple-signature.git"
@@ -11,11 +30,14 @@
   "keywords": [
     "react",
     "react-component",
+    "react component",
+    "react signature",
     "react-hook",
     "signature",
     "signature-pad",
     "signature pad",
     "e-signature",
+    "esignature",
     "esignature",
     "digital-signature",
     "online-signature",
@@ -31,6 +53,7 @@
     "touchscreen",
     "mouse",
     "pointer",
+    "handwriting",
     "write",
     "writing",
     "scribble",
@@ -45,30 +68,19 @@
     "widget"
   ],
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": [
-    "dist/index.js",
-    "dist/index.d.ts"
-  ],
   "sideEffects": false,
   "prepublishOnly": "npm run lint && npm test -- --run && npm run build",
   "scripts": {
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "lint-fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "test": "vitest",
-    "dev:example": "vite --config vite.config.example.ts"
+    "dev:example": "vite --config vite.config.example.ts",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

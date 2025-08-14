@@ -98,7 +98,7 @@ Use `ref.current?.clear()` to clear the canvas.
 
 ## Testing
 
-This project uses [Vitest](https://vitest.dev/) for unit and browser tests.  
+This project uses [Vitest](https://vitest.dev/) and [react-testing-library](https://github.com/testing-library/react-testing-library).  
 Run tests with:
 
 ```bash

@@ -22,7 +22,7 @@ npm install react-simple-signature
 
 ```tsx
 import React, { useRef } from 'react'
-import SimpleSignature, { SignatureRef } from 'react-simple-signature'
+import { SimpleSignature, type SignatureRef } from 'react-simple-signature'
 
 function MyForm() {
   const signatureRef = useRef<SignatureRef>(null)
@@ -33,14 +33,14 @@ function MyForm() {
   }
 
   const handleClear = () => {
-    padRef.current?.clear()
+    signatureRef.current?.clear()
   }
 
   return (
     <>
       <SimpleSignature
         ref={signatureRef}
-        onSignatureChange={handleSignature}
+        onChange={handleSignature}
         width={500}
         height={300}
         strokeColor="#0a0"
@@ -64,9 +64,10 @@ function MyForm() {
 | `height`     | `number`                         | —         | Canvas height in pixels                                       |
 | `width`      | `number`                         | —         | Canvas width in pixels                                        |
 | `className`  | `string`                         | `""`      | Optional class name for styling the canvas                    |
-| `ref`        | `Ref<SignatureRef>`              | —         | Ref exposing the `clear()` method for programmatic clearing   |
 | `blobFormat` | `"png"` \| `"jpeg"`              | `"png"`   | Format of the exported signature image                        |
 | `strokeColor`| `` `#${string}` ``               | `"#000"`  | Hex color for the signature stroke                            |
+
+> **Note:** A `ref` can be attached to access the [`SignatureRef`](#ref-api) with the `clear()` method.
 
 ---
 
@@ -75,12 +76,22 @@ function MyForm() {
 The component supports a `ref` so consumers can interact with it programmatically:
 
 ```ts
-interface SignaturePadRef {
+interface SignatureRef {
   clear: () => void
 }
 ```
 
 Use `ref.current?.clear()` to clear the canvas.
+
+Example usage:
+
+```ts
+import { useRef } from 'react'
+import { SimpleSignature, type SignatureRef } from 'react-simple-signature'
+
+const sigRef = useRef<SignatureRef>(null)
+sigRef.current?.clear()
+```
 
 ---
 

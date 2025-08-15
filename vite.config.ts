@@ -12,10 +12,12 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
+      tsconfigPath: path.resolve(__dirname, "tsconfig.json"),
       // Generate .d.ts into dist/ and add a "types" entry for the package root
       insertTypesEntry: true,
       outDir: "dist",
       include: ["src"],
+      rollupTypes: true, 
       exclude: ["**/*.test.*", "**/__tests__/**"]
     })
   ],
@@ -27,6 +29,9 @@ export default defineConfig({
       fileName: (format) => (format === "es" ? "index.js" : "index.cjs")
     },
     rollupOptions: {
+      output: {
+        exports: "named" 
+      },
       // mark peer deps as external so they’re not bundled
       external: ["react", "react-dom"]
     },

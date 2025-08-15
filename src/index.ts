@@ -1,31 +1,30 @@
-// src/index.ts
 import {
-  createElement , type ComponentType, type Ref
+  createElement 
+} from "react";
+import type {
+  ComponentType, Ref, ReactElement 
 } from "react";
 import Inner, {
   type SimpleSignatureProps,
   type SignatureRef
 } from "./component/SimpleSignature";
 
-/**
- * Adapter: exposes a real React ref to consumers while keeping the
- * inner component's current "ref as prop" API unchanged.
- */
-const SimpleSignature = (
+/** Public entry: accepts a React ref prop and passes it to the inner component */
+export function SimpleSignature(
   {
     ref, ...props 
-  }: Omit<SimpleSignatureProps, "ref"> & {
+  }: 
+  Omit<SimpleSignatureProps, "ref"> & {
     ref?: Ref<SignatureRef> 
   }
-) => createElement(Inner as unknown as ComponentType<SimpleSignatureProps>, {
-  ...(props as SimpleSignatureProps),
-  ref
-});
+): ReactElement | null {
+  // eslint-disable-next-line max-len
+  return createElement(Inner as unknown as ComponentType<SimpleSignatureProps>, {
+    ...(props as SimpleSignatureProps),
+    ref
+  });
+}
 
- 
-export {
-  SimpleSignature 
-};
 export type {
   SimpleSignatureProps, SignatureRef 
 };
